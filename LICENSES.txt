@@ -1,0 +1,50 @@
+Strum
+=====
+
+Strum is free software under the GNU General Public License, version 3 (see LICENSE). It is built
+on the work of others, listed below with their licenses. Their own license texts come with each
+package (node_modules, the Python environment) or are linked here.
+
+The program
+-----------
+- Tauri 2 (the window), MIT or Apache-2.0 — https://tauri.app
+- uv (installs Python and its packages), MIT or Apache-2.0 — https://github.com/astral-sh/uv
+- Python 3.12, PSF License — https://www.python.org
+- React 19, MIT; Zustand 5, MIT; Vite, MIT
+- alphaTab 1.9 (tabs and their sound), MPL-2.0 — https://alphatab.net
+  with the Bravura music font, SIL Open Font License 1.1, and the Sonivox soundfont, Apache-2.0
+- signalsmith-stretch 1.3 (speed and pitch), MIT — https://github.com/Signalsmith-Audio/signalsmith-stretch
+- pitchy 4 (the tuner), MIT
+- neural-amp-modeler-wasm 3.0 (the NAM engine), MIT — https://github.com/tone-3000/neural-amp-modeler-wasm
+- FastAPI, MIT; Starlette, BSD-3-Clause; Uvicorn, BSD-3-Clause; Pydantic, MIT; websockets, BSD-3-Clause
+- NumPy, BSD-3-Clause; Numba, BSD-2-Clause; SoundFile, BSD-3-Clause
+- sounddevice, MIT, with PortAudio, MIT, and Steinberg's ASIO SDK (GPL-3.0 option)
+- wasmtime, Apache-2.0 WITH LLVM-exception
+- python-stretch, MIT
+- lameenc (mp3), LGPL-3.0-or-later, with LAME, LGPL
+
+Song separation and analysis (downloaded when asked for)
+-------------------------------------------------------
+- PyTorch, BSD-3-Clause and others — https://pytorch.org
+- Demucs (HTDemucs 6s) by Meta, MIT, code and weights — https://github.com/adefossez/demucs
+- Beat This! by CP JKU, MIT, code and weights — https://github.com/CPJKU/beat_this
+- BTC (chords) by Jonggwon Park et al., MIT — https://github.com/jayg996/BTC-ISMIR19
+  (its code is included in kv_service/btc)
+- librosa, ISC; torchcrepe, MIT
+- faster-whisper, MIT; CTranslate2, MIT; Whisper large-v3 by OpenAI, MIT
+- NVIDIA cuBLAS (only on NVIDIA cards), NVIDIA's own license — https://docs.nvidia.com/cuda/eula/
+
+Sounds
+------
+- Demo amp models and cabinet impulse responses from TONE3000, MIT —
+  https://github.com/tone-3000/neural-amp-modeler-wasm
+- Amp captures from the community collection https://github.com/pelennor2170/NAM_models, GNU GPL v3;
+  captured by Tim R, Phillipe P, Sascha S and Helga B (the files and their sources: ATTRIBUTION below)
+- FluidR3 Mono GM (the sounds of tab-songs), MIT: FluidR3 by Frank Wen 2000-2002, the mono conversion
+  by Michael Cowgill 2014-17, as kept by MuseScore — https://github.com/musescore/MuseScore
+
+Amp names
+---------
+Fender, Marshall, Vox, Peavey, EVH, Roland, Friedman, Dumble, Celestion, Eminence and Mesa are
+trademarks of their owners. They name the amps and speakers the free captures were made from; Strum
+is not connected to or endorsed by them.

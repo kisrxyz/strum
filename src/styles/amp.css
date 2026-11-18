@@ -1,0 +1,341 @@
+/* ---------- amp screen («Комбик») ---------- */
+.amp {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(100%, 88rem);
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem;
+}
+
+.amp__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+}
+
+.amp__head h1 {
+  font-size: 1.75rem;
+}
+
+/* Preset tiles: quiet; the selected one is raised with an accent hairline. */
+.presets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.preset {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  text-align: left;
+  transition:
+    background-color 0.15s var(--ease),
+    border-color 0.15s var(--ease),
+    transform 0.12s var(--ease);
+}
+
+.preset:hover {
+  border-color: var(--line-2);
+}
+
+.preset:active {
+  transform: scale(0.99);
+}
+
+.preset--on,
+.preset--on:hover {
+  border-color: var(--accent);
+  background: var(--raised);
+}
+
+.preset__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.preset__name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition: color 0.15s var(--ease);
+}
+
+.preset--on .preset__name {
+  color: var(--accent);
+}
+
+.preset__amp {
+  overflow: hidden;
+  color: var(--text-3);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* The amp, cabinet and tone: one panel. */
+.amp__main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* The switches on the right are a column of up to three and a link: the selects sit in its middle,
+   not under an empty band. */
+.amp__sources {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.25rem;
+}
+
+.amp__sources .select {
+  flex: 0 1 15rem;
+}
+
+.amp__sources .select select {
+  min-width: 0;
+}
+
+.amp__about {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.125rem;
+  min-width: 10rem;
+  flex: 1 1 12rem;
+  padding-bottom: 0.125rem;
+}
+
+.amp__about p {
+  margin: 0;
+}
+
+.amp__about b {
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.amp__status {
+  color: var(--text-2);
+  font-size: 0.9375rem;
+}
+
+.amp__status--fallback {
+  color: var(--cold);
+}
+
+.amp__status--loading {
+  color: var(--text-3);
+}
+
+.amp__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
+.amp__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.25rem 1rem;
+}
+
+/* The amp's face: a row of knobs, like the panel of a real amp. */
+.amp__knobs {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 0.5rem 0.25rem;
+  border-top: 1px solid var(--line);
+}
+
+/* The master volume is not part of the preset: a hairline sets it apart. */
+.amp__master {
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--line);
+}
+
+/* Effects: three panels, each with its own switch in the head. */
+.effects {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.effect {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.effect > .switch {
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 0.125rem;
+  color: var(--text-2);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.effect--on > .switch,
+.effect > .switch:hover {
+  color: var(--text);
+}
+
+/* A pedal: its switch on top, small knobs in a row under it. */
+.effect__knobs {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  gap: 0.5rem;
+  min-height: 5.25rem;
+}
+
+.effect__type {
+  align-self: center;
+  transition: opacity 0.15s var(--ease);
+}
+
+.effect__type--off {
+  opacity: 0.45;
+}
+
+/* ---------- mixer strips (song screen, «Дорожки») ---------- */
+.strip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--bg);
+}
+
+.strip--silent {
+  opacity: 0.55;
+}
+
+.strip--guitar {
+  border-color: rgba(242, 162, 74, 0.55);
+}
+
+.strip__top {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.strip__name {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.strip__you {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--accent);
+  font-size: 0.8125rem;
+  text-overflow: ellipsis;
+}
+
+.strip__db {
+  margin-left: auto;
+  color: var(--text-3);
+  font-family: var(--font-num);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.strip__buttons {
+  display: flex;
+  gap: 0.375rem;
+}
+
+/* Laptops with Windows scaling at 125–150 % leave about 650–760 px of height for the page. */
+@media (max-height: 720px) {
+
+  .amp {
+    gap: 0.75rem;
+    padding: 0.875rem 1.5rem;
+  }
+
+  .amp__main {
+    gap: 1rem;
+  }
+
+  .amp__knobs {
+    padding-top: 0.75rem;
+  }
+
+  .preset {
+    padding: 0.625rem 0.875rem;
+  }
+
+  .effect {
+    gap: 0.5rem;
+  }
+
+  .strip {
+    gap: 0.25rem;
+    padding: 0.375rem 0.625rem;
+  }
+}
+
+@media (max-width: 1100px) {
+
+  .amp__knobs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .amp__master {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .preset,
+  .preset__name {
+    transition: none;
+  }
+}
+
+/* The hum filter with its mains (Auto / 50 / 60 Hz) beside it. */
+.amp__hum {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.amp__mains {
+  font-size: 0.8125rem;
+  transition: opacity 0.15s var(--ease);
+}
+
+.amp__mains--off {
+  opacity: 0.45;
+}

@@ -1,0 +1,706 @@
+/* ---------- tuner ---------- */
+/* In tune = warm, close = neutral, off = cold. Never red. */
+.tuner {
+  --cents: 0;
+  --tone: var(--text-3);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  /* ♯ and ♭ are missing from Bahnschrift: keep the fallback a plain glyph, not a colour emoji. */
+  font-variant-emoji: text;
+}
+
+.tuner[data-state='in'] {
+  --tone: var(--warm);
+}
+
+.tuner[data-state='close'] {
+  --tone: var(--neutral);
+}
+
+.tuner[data-state='off'] {
+  --tone: var(--cold);
+}
+
+.tuner__note {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  min-width: 2.2em;
+  color: var(--tone);
+  font-family: var(--font-num), 'Segoe UI Symbol', 'Apple Symbols';
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.12s var(--ease);
+}
+
+.tuner[data-state='idle'] .tuner__note {
+  color: var(--text-3);
+}
+
+/* ♯ is about as tall as a capital: half size, lifted to the letter's top. */
+.tuner__acc {
+  font-size: 0.5em;
+  font-weight: 400;
+  transform: translateY(-0.7em);
+}
+
+.tuner__octave {
+  margin-left: 0.06em;
+  color: var(--text-3);
+  font-size: 0.38em;
+  font-weight: 400;
+}
+
+.tuner__side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* The scale: −50 … +50 cents, ticks every 10, a band for «in tune» (±3 cents). */
+.tuner__scale {
+  position: relative;
+  height: 1.5rem;
+  margin: 0 1.25rem;
+}
+
+.tuner__scale::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--line-2);
+}
+
+.tuner__ticks {
+  position: absolute;
+  top: 30%;
+  bottom: 30%;
+  left: 0;
+  right: 0;
+  border-right: 1px solid var(--line-2);
+  background: linear-gradient(90deg, var(--line-2) 1px, transparent 1px) 0 0 / 10% 100% repeat-x;
+}
+
+.tuner__zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 47%;
+  width: 6%;
+  border-radius: 3px;
+  background: var(--raised);
+  transition: background-color 0.15s var(--ease);
+}
+
+.tuner[data-state='in'] .tuner__zone {
+  background: var(--accent-soft);
+}
+
+.tuner__center {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 1px);
+  width: 2px;
+  border-radius: 1px;
+  background: var(--text-3);
+  transition: background-color 0.15s var(--ease);
+}
+
+.tuner[data-state='in'] .tuner__center {
+  background: var(--warm);
+}
+
+/* The needle spans the scale and moves by transform: ±50 cents = ±50 % of the scale. */
+.tuner__needle {
+  position: absolute;
+  inset: 0;
+  transform: translateX(calc(var(--cents) * 1%));
+  transition:
+    transform 70ms linear,
+    opacity 0.15s var(--ease);
+}
+
+.tuner__needle::before {
+  content: '';
+  position: absolute;
+  top: -0.25rem;
+  bottom: -0.25rem;
+  left: calc(50% - var(--needle, 4px) / 2);
+  width: var(--needle, 4px);
+  border-radius: 3px;
+  background: var(--tone);
+}
+
+.tuner[data-state='idle'] .tuner__needle {
+  opacity: 0;
+}
+
+.tuner__flat,
+.tuner__sharp {
+  position: absolute;
+  top: 50%;
+  color: var(--text-3);
+  font-family: 'Segoe UI Symbol', 'Apple Symbols', var(--font);
+  font-size: 0.875rem;
+  line-height: 1;
+  transform: translateY(-50%);
+}
+
+.tuner__flat {
+  right: calc(100% + 0.5rem);
+}
+
+.tuner__sharp {
+  left: calc(100% + 0.5rem);
+}
+
+.tuner__meta {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  color: var(--text-2);
+}
+
+.tuner__cents {
+  color: var(--tone);
+  font-weight: 500;
+}
+
+.tuner__cents:not(:empty)::after {
+  /* The unit's word comes from the dictionary (Tuner.tsx `data-unit`). */
+  content: ' ' attr(data-unit);
+  color: var(--text-3);
+  font-family: var(--font);
+  font-size: 0.8em;
+  font-weight: 400;
+}
+
+.tuner--compact .tuner__note {
+  font-size: 2rem;
+}
+
+.tuner--compact .tuner__scale {
+  width: 12rem;
+  height: 1rem;
+}
+
+.tuner--compact .tuner__meta {
+  font-size: 0.8125rem;
+}
+
+.tuner--big {
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.tuner--big .tuner__note {
+  font-size: 7rem;
+}
+
+.tuner--big .tuner__side {
+  width: min(100%, 40rem);
+  gap: 1rem;
+}
+
+.tuner--big .tuner__scale {
+  height: 2.5rem;
+}
+
+.tuner--big .tuner__meta {
+  justify-content: center;
+  font-size: 1.125rem;
+}
+
+/* ---------- level meter ---------- */
+/* Good = warm, loud or a little soft = neutral, too quiet or clipping = cold. */
+.meter {
+  --zone: var(--text-3);
+}
+
+.meter[data-zone='soft'] {
+  --zone: var(--neutral);
+}
+
+.meter[data-zone='low'],
+.meter[data-zone='clip'] {
+  --zone: var(--cold);
+}
+
+.meter[data-zone='good'] {
+  --zone: var(--warm);
+}
+
+.meter[data-zone='hot'] {
+  --zone: var(--neutral);
+}
+
+.meter__track {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--raised-2);
+}
+
+/* The "good" band: -16 … -6 dBFS on a -60 … 0 scale (GOOD_FROM_DB, GOOD_TO_DB in src/dsp/level.ts). */
+.meter__good {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 73.33%;
+  width: 16.67%;
+  background: var(--accent-soft);
+}
+
+.meter__fill {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: inherit;
+  background: var(--zone);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.meter__hold {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--text);
+  opacity: 0.7;
+}
+
+/* Compact: a thin bar with no text, for the preset button in the top bar. Quiet unless off. */
+.meter--compact,
+.meter--compact[data-zone='soft'],
+.meter--compact[data-zone='good'],
+.meter--compact[data-zone='hot'] {
+  --zone: var(--text-2);
+}
+
+.meter--compact {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 2.5rem;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--raised-2);
+  vertical-align: middle;
+}
+
+.meter--compact[data-zone='silent'] {
+  --zone: var(--text-3);
+}
+
+.meter--compact[data-zone='low'],
+.meter--compact[data-zone='clip'] {
+  --zone: var(--cold);
+}
+
+.meter--big .meter__track {
+  width: 100%;
+  height: 0.625rem;
+}
+
+.meter__text {
+  margin: 0.625rem 0 0;
+  color: var(--text-2);
+  font-size: 0.9375rem;
+}
+
+.meter[data-zone='low'] .meter__text,
+.meter[data-zone='clip'] .meter__text {
+  color: var(--cold);
+}
+
+/* ---------- «Подстроить под мою гитару» ---------- */
+.trim {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.trim__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.9375rem;
+}
+
+.trim__line b {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.trim__ask {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+/* How much of the listening is done: the accent, it is what matters now. */
+.trim__track {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 0.375rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--raised-2);
+}
+
+.trim__fill {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.trim__dots {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- latency ---------- */
+.latency {
+  display: inline-flex;
+  align-items: center;
+  height: 1.75rem;
+  padding: 0 0.625rem;
+  border-radius: var(--r-sm);
+  background: var(--raised);
+  font-family: var(--font-num);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.latency[data-rating='great'],
+.lat[data-rating='great'] .lat__total {
+  color: var(--warm);
+}
+
+.latency[data-rating='ok'],
+.lat[data-rating='ok'] .lat__total {
+  color: var(--neutral);
+}
+
+.latency[data-rating='bad'],
+.lat[data-rating='bad'] .lat__total {
+  color: var(--cold);
+}
+
+/* ---------- input screen («Вход») ---------- */
+.input {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(100%, 88rem);
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem;
+}
+
+.input__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.input__head h1 {
+  font-size: 1.75rem;
+}
+
+.input__lang {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-left: auto;
+}
+
+.input__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.input__col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.input__col h2 {
+  font-size: 1rem;
+}
+
+.input__col .select select {
+  min-width: 0;
+}
+
+.input__col--tuner {
+  align-items: center;
+}
+
+.input__col--tuner h2 {
+  align-self: flex-start;
+}
+
+.input__col--tuner .tuner--big {
+  flex: 1;
+  justify-content: center;
+}
+
+.input__col--tuner .tuner--big .tuner__note {
+  font-size: 5.5rem;
+}
+
+.input__col--tuner .tuner--big .tuner__meta {
+  font-size: 1rem;
+}
+
+.input__bigtuner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0;
+}
+
+/* One line of plain text in a column; cold when something needs doing. */
+.input__line {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.875rem;
+}
+
+.input__line--cold {
+  color: var(--cold);
+}
+
+.input__channel-now {
+  margin-left: 0.5rem;
+  color: var(--text-3);
+}
+
+.input__notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.calib {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-2);
+  font-size: 0.9375rem;
+}
+
+.calib__label {
+  margin-right: 0.375rem;
+}
+
+.calib__label b {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.calib__btn {
+  width: 2.25rem;
+  padding: 0;
+  font-size: 1rem;
+}
+
+.lat {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.375rem 1rem;
+}
+
+.lat__total {
+  font-size: 2.5rem;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.lat__parts {
+  color: var(--text-3);
+  font-size: 0.875rem;
+}
+
+.lat__text {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.9375rem;
+}
+
+.lat__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ---------- big tuner (T) ---------- */
+.bigtuner {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 2.5rem;
+  background: var(--bg);
+}
+
+.bigtuner .tuner--big {
+  --needle: 6px;
+  gap: 1.75rem;
+}
+
+.bigtuner .tuner__flat,
+.bigtuner .tuner__sharp {
+  font-size: 1.25rem;
+}
+
+.bigtuner .tuner--big .tuner__note {
+  font-size: min(12rem, 28vh);
+}
+
+.bigtuner .tuner--big .tuner__side {
+  width: min(100%, 46rem);
+  gap: 1.25rem;
+}
+
+.bigtuner .tuner--big .tuner__scale {
+  height: 3.5rem;
+}
+
+.bigtuner .tuner--big .tuner__meta {
+  font-size: 1.5rem;
+}
+
+.bigtuner__hint {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 0.875rem;
+}
+
+/* ---------- start screen ---------- */
+.launch {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2.5rem;
+  background: var(--bg);
+  text-align: center;
+}
+
+.launch__title {
+  margin-bottom: 0.5rem;
+  color: var(--text);
+  font-size: 3rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.launch__go kbd {
+  margin: 0 0.125rem;
+}
+
+.launch__lead {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 1.25rem;
+}
+
+.launch__hint {
+  max-width: 34em;
+  margin: 0;
+  color: var(--text-3);
+  font-size: 0.9375rem;
+}
+
+.launch__error {
+  max-width: 32em;
+  margin: 0;
+  color: var(--cold);
+  font-size: 1.125rem;
+}
+
+/* Laptops with Windows scaling at 125–150 % leave about 650–760 px of height for the page. */
+@media (max-height: 720px) {
+
+  .input {
+    gap: 0.75rem;
+    padding: 0.875rem 1.5rem;
+  }
+
+  .input__col {
+    gap: 0.75rem;
+  }
+
+  .input__col--tuner .tuner--big .tuner__note {
+    font-size: 4.5rem;
+  }
+
+  .input__head h1 {
+    font-size: 1.5rem;
+  }
+
+}
+
+@media (max-width: 1100px) {
+
+  .input__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .input__grid .input__col:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .tuner--compact .tuner__scale {
+    width: 9rem;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .tuner__needle,
+  .tuner__note,
+  .tuner__zone,
+  .tuner__center {
+    transition: none;
+  }
+
+}

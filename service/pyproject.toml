@@ -1,0 +1,93 @@
+[project]
+name = "kv-service"
+version = "0.1.0"
+description = "Strum: the local song service (stems, analysis, backing tracks) and the fast guitar engine"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.162,<0.163",
+    "uvicorn>=0.54,<0.55",
+    "python-multipart>=0.0.33,<0.1",
+    "numpy>=2.3,<2.6",
+    "soundfile>=0.14,<0.15",
+    "python-stretch==0.3.1",
+    "lameenc>=1.9,<2",
+    # Stage 4½: the fast guitar engine (kv_guitar) — ASIO through PortAudio, and our NAM wasm.
+    "sounddevice==0.5.6",
+    "wasmtime==50.0.1",
+    # The WebSocket protocol for uvicorn (the engine's /guitar link to the browser).
+    "websockets==17.4",
+    # The amp chain's per-sample kernels (kv_guitar.dsp, kv_guitar.reverb). The version that
+    # librosa (the ml group) already brought in.
+    "numba==0.68.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2,<10",
+    "httpx>=0.28,<0.29",
+]
+# The neural networks. `npm run setup` installs them in the author's copy (`--group ml --group cuda
+# --group roformer`); the installed app adds them from inside the app (kv_service/components.py):
+# `ml` with `cuda` on an NVIDIA card (about 3 GB), `ml` with `cpu` otherwise (PyTorch for the processor).
+ml = [
+    "torch>=2.15,<2.16",
+    "demucs==4.1.0",
+    # Stage 2: beats and bars (Beat This!), and the audio features for the chord model (BTC,
+    # whose code lives in kv_service/btc), the tuning in cents and the song sections.
+    "beat-this==1.1.0",
+    "librosa>=1.0,<1.1",
+    # Stage 3: the words of the vocal stem (draft lyrics, and the timing of pasted lyrics).
+    "faster-whisper==1.2.1",
+    "ctranslate2>=4.8.5,<4.9",
+    # Stage 4: the notes of the guitar stem («радар нот»): pitch per 10 ms (CREPE, MIT; its weights
+    # come inside the wheel, 72 MB).
+    "torchcrepe==0.0.24",
+]
+# PyTorch built for NVIDIA cards (CUDA 13.2: driver 580 or newer, GTX 16xx / RTX and newer). CTranslate2's
+# GPU build needs the CUDA 12 cuBLAS, while this PyTorch brings CUDA 13: hence the extra wheel (its
+# DLLs are put on the search path before ctranslate2 loads).
+cuda = [
+    "torch>=2.15,<2.16",
+    "nvidia-cublas-cu12==12.9.2.10; sys_platform == 'win32' or sys_platform == 'linux'",
+]
+# PyTorch for the processor (no NVIDIA card): PyPI's build, which on Windows is the processor one.
+cpu = ["torch>=2.15,<2.16"]
+# BS-RoFormer SW: only in the author's copy. Its weights may not be given away, and the package comes
+# from git, which a clean Windows does not have.
+roformer = ["bs-roformer-infer"]
+
+[build-system]
+requires = ["uv_build>=0.13,<0.14"]
+build-backend = "uv_build"
+
+[tool.uv]
+# The two builds of PyTorch: one of them, never both.
+conflicts = [[{ group = "cpu" }, { group = "cuda" }]]
+# Windows laptop now, maybe an Apple Silicon MacBook later. Intel Macs are left out:
+# demucs pins them to PyTorch < 2.3.
+environments = [
+    "sys_platform == 'win32' and platform_machine == 'AMD64'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
+
+# CUDA builds of PyTorch for Windows and Linux; macOS gets the regular PyPI build (CPU / MPS).
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu132", group = "cuda", marker = "sys_platform == 'win32' or sys_platform == 'linux'" },
+]
+# OpenMIRLab no longer publishes to PyPI; pinned to the latest main commit (2026-10-05).
+bs-roformer-infer = { git = "https://github.com/openmirlab/bs-roformer-infer", rev = "95c8de7b0b091d00f064d694bf916a21866c32f5" }
+
+[[tool.uv.index]]
+name = "pytorch-cu132"
+url = "https://download.pytorch.org/whl/cu132"
+explicit = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "gpu: needs the real models and a GPU (run with -m gpu)",
+    "asio: needs the real sound card (run with -m asio)",
+]
+addopts = "-m 'not gpu and not asio'"

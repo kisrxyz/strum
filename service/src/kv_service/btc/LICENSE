@@ -1,0 +1,37 @@
+The code in this folder is vendored from the unofficial Hugging Face packaging of BTC,
+https://huggingface.co/puar-playground/btc-chord, revision d436f2f664f5107cd987774279b8ce171846e376
+(files btc_src/btc_model.py, btc_src/transformer_modules.py, btc_src/features.py and the inference
+loop of modeling_btc.py), which its model card publishes under the MIT licence. That packaging
+contains the network and feature code of the original project:
+
+    BTC-ISMIR19 — A Bi-Directional Transformer for Musical Chord Recognition
+    https://github.com/jayg996/BTC-ISMIR19
+
+Changes for Квартирник: the `transformers` / `huggingface_hub` loader is dropped (weights are loaded
+by path from service/.models), two files are merged into model.py, the inference runs the
+108-frame chunks in batches, and the CQT input may come at any sample rate (it is resampled to
+22 050 Hz as `librosa.load` would). The network itself is unchanged, so the original weights load.
+
+The licence of the original project follows.
+
+MIT License
+
+Copyright (c) 2019 Jonggwon Park
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -1,0 +1,53 @@
+{
+  "name": "kvartirnik",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Strum: guitar amp, songs without the guitarist, chords, tabs and lyrics",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently --names app,service,guitar --prefix-colors yellow,cyan,magenta --kill-others-on-fail \"vite\" \"node scripts/dev-service.mjs\" \"node scripts/dev-guitar.mjs\"",
+    "predev": "node scripts/setup-tones.mjs --quiet",
+    "dev:app": "vite",
+    "dev:service": "node scripts/dev-service.mjs",
+    "dev:guitar": "node scripts/dev-guitar.mjs",
+    "shortcut": "node scripts/shortcut.mjs",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:service": "node scripts/uv.mjs run --no-sync --directory service pytest",
+    "probe:guitar": "node scripts/probe-guitar.mjs",
+    "typecheck": "tsc --noEmit",
+    "setup": "node scripts/setup-tones.mjs && node scripts/setup-service.mjs",
+    "postinstall": "node scripts/setup-tones.mjs && node scripts/setup-service.mjs",
+    "build:app": "node scripts/build-app.mjs",
+    "public-copy": "node scripts/public-copy.mjs"
+  },
+  "dependencies": {
+    "@coderline/alphatab": "^1.9.0",
+    "neural-amp-modeler-wasm": "^3.0.7",
+    "pitchy": "^4.1.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "signalsmith-stretch": "1.3.2",
+    "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "@coderline/alphatab-vite": "^1.9.0",
+    "@tauri-apps/cli": "^2.12.5",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "binaryen": "132.0.0",
+    "concurrently": "^10.0.6",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
+  },
+  "overrides": {
+    "neural-amp-modeler-wasm": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    }
+  }
+}

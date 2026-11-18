@@ -1,0 +1,43 @@
+node_modules/
+dist/
+coverage/
+.vite/
+
+# Downloaded / copied audio assets (recreated by `npm run setup`)
+public/nam/
+public/tones/
+# alphaTab's music font and soundfont, copied by its Vite plugin
+public/font/
+public/soundfont/
+
+# Songs and audio never go to git
+test-songs/
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.ogg
+*.aac
+
+.DS_Store
+Thumbs.db
+
+# Browser test output (screenshots, console logs)
+.playwright-mcp/
+
+# Python song service (stage 1): environment, caches, downloaded neural networks
+service/.venv/
+service/.models/
+__pycache__/
+.pytest_cache/
+
+# The song library: the author's songs and separated stems stay on the laptop
+library/
+
+# The Strum window (shell/): Rust build output, staged resources (scripts/build-app.mjs), Tauri's schemas
+shell/target/
+shell/resources/
+shell/gen/
+
+# Words the public copy must not contain (scripts/public-copy.mjs); private, never in git
+.public-words

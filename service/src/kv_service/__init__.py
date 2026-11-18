@@ -1,0 +1,1 @@
+"""Квартирник: local song service."""

@@ -1,0 +1,326 @@
+/* The app's frame: the top bar, toasts, the drop zone and the start screen. */
+.app {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---------- top bar ---------- */
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  height: 3.25rem;
+  padding: 0 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.topbar__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.topbar__mark {
+  width: 1rem;
+  height: 1rem;
+  color: var(--accent);
+}
+
+.topbar__nav {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.topbar__nav button {
+  height: 2rem;
+  padding: 0 0.75rem;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text-2);
+  font-size: 0.875rem;
+  transition:
+    background-color 0.15s var(--ease),
+    color 0.15s var(--ease);
+}
+
+.topbar__nav button:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.topbar__nav button[aria-current='true'] {
+  background: var(--raised);
+  color: var(--text);
+}
+
+.topbar__song {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  min-width: 0;
+  max-width: 44vw;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.topbar__title {
+  overflow: hidden;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+}
+
+.topbar__artist {
+  overflow: hidden;
+  color: var(--text-2);
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+}
+
+.topbar__facts,
+.topbar__status {
+  color: var(--text-3);
+  font-size: 0.8125rem;
+}
+
+.topbar__status--cold {
+  color: var(--cold);
+}
+
+.topbar__right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.topbar__right .btn {
+  height: 2rem;
+}
+
+.topbar__preset {
+  max-width: 16rem;
+  overflow: hidden;
+}
+
+/* ---------- toast and drop zone ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 5rem;
+  z-index: 40;
+  max-width: min(44rem, calc(100vw - 2.5rem));
+  padding: 0.625rem 1rem;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  background: var(--raised-2);
+  font-size: 0.9375rem;
+  transform: translateX(-50%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  animation: kv-rise 0.2s var(--ease);
+}
+
+.toast--warn {
+  border-color: var(--cold);
+}
+
+@keyframes kv-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 0.5rem);
+  }
+}
+
+.dropzone {
+  position: fixed;
+  inset: 1rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+  border: 2px dashed var(--accent);
+  border-radius: var(--r-lg);
+  background: rgba(19, 18, 17, 0.92);
+  color: var(--text);
+  font-size: 1.25rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* «Запись» (\): a hollow dot; while recording, a filled accent dot and the time. */
+.topbar__rec {
+  gap: 0.5rem;
+}
+
+.topbar__rec i {
+  width: 0.625rem;
+  height: 0.625rem;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+
+.topbar__rec--on {
+  color: var(--accent);
+}
+
+.topbar__rec--on i {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+/* The Keys sheet (F1 or ?): every key in one place, over any screen — Stage (50) included. */
+.keys-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  background: var(--bg);
+  overflow: auto;
+}
+
+.keys-sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.keys-sheet__head h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.keys-sheet__groups {
+  columns: 3 18rem;
+  column-gap: 2.5rem;
+}
+
+.keys-sheet__group {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+}
+
+.keys-sheet__group h2 {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.keys-sheet__group dl {
+  margin: 0;
+}
+
+.keys-sheet__row {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 0.75rem;
+  align-items: baseline;
+  padding: 0.0625rem 0;
+}
+
+.keys-sheet__row dt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.keys-sheet__row dd {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.keys-sheet__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-3);
+}
+
+/* About: the version and every license. */
+.about-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem 2rem;
+  background: var(--bg);
+  overflow: auto;
+}
+
+.about-sheet > * {
+  max-width: 56rem;
+}
+
+.about-sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.about-sheet__head h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.about-sheet__version {
+  margin-left: 0.5rem;
+  font-size: 1rem;
+  color: var(--text-2);
+}
+
+.about-sheet p {
+  margin: 0;
+}
+
+.about-sheet h2 {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.about-sheet__text {
+  margin: 0;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  color: var(--text-2);
+}
+
+.about-sheet__gpl summary {
+  cursor: pointer;
+  color: var(--text-2);
+}
+
+.about-sheet__gpl[open] summary {
+  margin-bottom: 0.5rem;
+}
+
+.about-sheet__hint {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+}

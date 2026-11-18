@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="dark" />
+    <title>Strum</title>
+    <style>
+      :root {
+        --bg: #16110d;
+        --text: #eee4d8;
+        --muted: #a39484;
+        --accent: #f2a24a;
+        --cold: #8fb3c9;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 16px/1.5 'Segoe UI', system-ui, sans-serif;
+        cursor: default;
+        user-select: none;
+      }
+      main {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        padding: 0 24px;
+        text-align: center;
+      }
+      svg {
+        width: 56px;
+        height: 56px;
+        color: var(--accent);
+      }
+      h1 {
+        margin: 0;
+        font-weight: 500;
+        font-size: 28px;
+      }
+      #lead {
+        margin: 0;
+        max-width: 560px;
+      }
+      #detail {
+        margin: 0;
+        min-height: 1.5em;
+        max-width: 720px;
+        color: var(--muted);
+        font-size: 13px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .error #lead {
+        color: var(--cold);
+      }
+      .bar {
+        width: 220px;
+        height: 3px;
+        border-radius: 2px;
+        background: #2a221b;
+        overflow: hidden;
+      }
+      .bar::after {
+        content: '';
+        display: block;
+        width: 35%;
+        height: 100%;
+        background: var(--accent);
+        animation: slide 1.4s ease-in-out infinite;
+      }
+      .error .bar {
+        visibility: hidden;
+      }
+      @keyframes slide {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(300%);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .bar::after {
+          animation: none;
+          width: 100%;
+          opacity: 0.4;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main id="main">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M30.0 9.0L30.0 9.7L29.9 10.4L29.7 11.0L27.3 17.9L27.1 18.5L26.9 19.1L26.6 19.6L26.3 20.2L25.9 20.7L25.6 21.2L25.2 21.7L17.9 30.1L17.4 30.5L16.9 30.8L16.3 31.0L15.7 31.0L15.1 30.8L14.6 30.5L14.1 30.1L6.8 21.7L6.4 21.2L6.1 20.7L5.7 20.2L5.4 19.6L5.1 19.1L4.9 18.5L4.7 17.9L2.3 11.0L2.1 10.4L2.0 9.7L2.0 9.0L2.0 8.3L2.1 7.6L2.3 7.0L2.6 6.4L2.9 5.7L3.2 5.2L3.7 4.7L4.2 4.2L4.7 3.7L5.2 3.4L5.9 3.1L6.5 2.8L7.1 2.6L7.8 2.5L15.4 2.0L16.0 2.0L16.6 2.0L24.0 2.5L24.6 2.6L25.3 2.8L25.9 3.0L26.6 3.3L27.1 3.6L27.7 4.0L28.2 4.5L28.6 5.0L29.0 5.6L29.3 6.2L29.6 6.8L29.8 7.4L29.9 8.1L30.0 8.8Z"
+        />
+      </svg>
+      <h1>Strum</h1>
+      <p id="lead"></p>
+      <div class="bar" aria-hidden="true"></div>
+      <p id="detail"></p>
+    </main>
+    <script>
+      // Words of the start screen. The app's own words live in src/i18n; this page shows before
+      // the app is there. The language is the one saved in the app's settings (main.rs).
+      const WORDS = {
+        en: {
+          starting: 'Starting…',
+          setup: 'Getting Strum ready for its first launch. This takes a minute or two and needs the internet once.',
+          files: 'Some program files are missing. Reinstall Strum.',
+          download: "Couldn't download what Strum needs. Check the internet and open Strum again.",
+          service: "Strum didn't start in time. Close it and open it again.",
+          other: "Strum couldn't start. Close it and open it again.",
+          logs: 'Logs',
+        },
+        ru: {
+          starting: 'Запуск…',
+          setup: 'Strum готовится к первому запуску. Это минута-две, один раз нужен интернет.',
+          files: 'Не хватает файлов программы. Переустанови Strum.',
+          download: 'Не удалось скачать нужное для Strum. Проверь интернет и открой Strum ещё раз.',
+          service: 'Strum не запустился вовремя. Закрой его и открой ещё раз.',
+          other: 'Strum не запустился. Закрой его и открой ещё раз.',
+          logs: 'Журналы',
+        },
+      };
+      const lang = window.__strumLang === 'ru' ? 'ru' : 'en';
+      const w = WORDS[lang];
+      document.documentElement.lang = lang;
+      const main = document.getElementById('main');
+      const lead = document.getElementById('lead');
+      const detail = document.getElementById('detail');
+      lead.textContent = w.starting;
+
+      function errorWords(text) {
+        const [what, logs] = text.split('\n');
+        const kind = what === 'files' ? 'files' : what === 'service' ? 'service' : what.startsWith('setup:') ? 'download' : 'other';
+        const info = kind === 'download' ? what.slice(6) : kind === 'other' ? what : '';
+        return { lead: w[kind], detail: [info, logs ? `${w.logs}: ${logs}` : ''].filter(Boolean).join('\n') };
+      }
+
+      window.strum = {
+        show(state, text) {
+          main.classList.toggle('error', state === 'error');
+          if (state === 'error') {
+            const words = errorWords(text);
+            lead.textContent = words.lead;
+            detail.textContent = words.detail;
+            return;
+          }
+          lead.textContent = w[state] || w.starting;
+          detail.textContent = text;
+        },
+      };
+    </script>
+  </body>
+</html>

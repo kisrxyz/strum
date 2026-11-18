@@ -1,0 +1,41 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Strum",
+  "version": "../package.json",
+  "identifier": "app.strum",
+  "build": {
+    "frontendDist": "splash"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "Strum",
+    "copyright": "GPL-3.0",
+    "category": "Music",
+    "shortDescription": "Guitar amp, songs without the guitarist, chords, tabs and lyrics",
+    "longDescription": "Play your guitar through amp models with a song whose guitar part is taken out, with its chords, tabs and lyrics following the recording.",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
+    "resources": {
+      "resources/uv.exe": "uv.exe",
+      "resources/app/": "app/",
+      "resources/web/": "web/",
+      "resources/LICENSES.txt": "LICENSES.txt"
+    },
+    "windows": {
+      "webviewInstallMode": { "type": "downloadBootstrapper" },
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["English", "Russian"],
+        "displayLanguageSelector": false,
+        "installerIcon": "icons/icon.ico"
+      }
+    }
+  }
+}
