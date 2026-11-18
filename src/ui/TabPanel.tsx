@@ -1,3 +1,4 @@
+import { FileMusic, Printer, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { L, withKey } from '../i18n';
 import { useLang } from '../i18n/useLang';
@@ -24,6 +25,7 @@ export function TabPanel({ song, analysis }: { song: Song; analysis: Analysis | 
   const t = useLang();
   const scroller = useRef<HTMLDivElement>(null);
   const surface = useRef<HTMLDivElement>(null);
+  const picker = useRef<HTMLInputElement>(null);
   const glue = useRef<TabGlue | null>(null);
   const [bars, setBars] = useState<TabBar[]>([]);
   const [tempo, setTempo] = useState(0);
@@ -102,21 +104,41 @@ export function TabPanel({ song, analysis }: { song: Song; analysis: Analysis | 
 
   if (!tab) {
     return (
-      <div className="tabview tabview--empty">
-        <p>{t.songUi.tab.empty}</p>
+      <div className="empty">
+        <FileMusic size={36} />
+        <h2 className="empty__title">{t.songUi.tab.emptyTitle}</h2>
+        <p className="empty__text">{t.songUi.tab.empty}</p>
+        <div className="empty__actions">
+          <button type="button" className="btn btn--primary btn--lg" onClick={() => picker.current?.click()}>
+            {t.songUi.tab.choose}
+          </button>
+        </div>
+        <input
+          ref={picker}
+          type="file"
+          hidden
+          accept=".gp,.gp3,.gp4,.gp5,.gpx,.musicxml,.mxl,.xml"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            e.target.value = '';
+            if (file) void textActions.addTabFile(file);
+          }}
+        />
       </div>
     );
   }
   return (
     <div className="tabview">
-      <div ref={scroller} className="tabview__scroll">
-        <div ref={surface} className="tabview__surface" />
-      </div>
-      <div className="tabview__bar">
+      <div className="view-tools">
+        {failed && <span className="note note--cold">{failed}</span>}
+        <span className="tabview__name" title={tab.name}>
+          {tab.name}
+        </span>
         {parts.length > 1 && (
           <label className="tabview__part" title={withKey(t.songUi.nextPart, "'")}>
             {t.songUi.tab.part}
             <select
+              className="sel"
               value={Math.min(tab.track, parts.length - 1)}
               onChange={(e) => {
                 textActions.pickTabTrack(Number(e.target.value));
@@ -131,19 +153,18 @@ export function TabPanel({ song, analysis }: { song: Song; analysis: Analysis | 
             </select>
           </label>
         )}
-        <span className="tabview__name" title={tab.name}>
-          {tab.name}
-        </span>
-        {failed && <span className="tabview__error">{failed}</span>}
         {/* The keys of this bar (', Shift+', ;, Shift+;) are on the Keys sheet. */}
-        <button type="button" className="chip" style={{ marginLeft: 'auto' }} onClick={() => glue.current?.print()}>
-          {t.songUi.print}
+        <button type="button" className="iconbtn iconbtn--sm" aria-label={t.songUi.print} title={t.songUi.print} onClick={() => glue.current?.print()}>
+          <Printer size={14} />
         </button>
         {!ownTimeline && (
-          <button type="button" className="chip" onClick={() => void textActions.removeTab()}>
-            {t.songUi.tab.remove}
+          <button type="button" className="iconbtn iconbtn--sm" aria-label={t.songUi.tab.remove} title={t.songUi.tab.remove} onClick={() => void textActions.removeTab()}>
+            <Trash2 size={14} />
           </button>
         )}
+      </div>
+      <div ref={scroller} className="tabview__scroll">
+        <div ref={surface} className="tabview__surface" />
       </div>
     </div>
   );

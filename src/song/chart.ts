@@ -2,7 +2,7 @@
 // written at the beat it starts on. Pure logic for `ChordChart`.
 import { sectionLabel } from './sections';
 import type { Bar } from '../music/bars';
-import type { ChordSegment, Section } from './types';
+import type { ChordSegment, Section, SectionKind } from './types';
 
 export interface ChartChord {
   /** The beat of the bar the chord is written at (0 = the bar's first beat). */
@@ -23,6 +23,8 @@ export interface ChartBar {
 export interface ChartRow {
   /** The section's name on the row it starts; null on the rows after. */
   section: string | null;
+  /** The kind of the section the row is in (its colour); null outside every section. */
+  kind: SectionKind | null;
   bars: ChartBar[];
 }
 
@@ -72,7 +74,7 @@ export function chartRows(bars: Bar[], track: ChordSegment[], sections: Section[
     const s = sectionAt(sections, bar.start);
     const newSection = s !== currentSection;
     if (!current || newSection || current.bars.length >= perRow) {
-      current = { section: newSection && s ? sectionLabel(sections, sections.indexOf(s), fromFile) : null, bars: [] };
+      current = { section: newSection && s ? sectionLabel(sections, sections.indexOf(s), fromFile) : null, kind: s?.kind ?? null, bars: [] };
       rows.push(current);
       currentSection = s;
     }

@@ -1,182 +1,227 @@
 /*
- * «Песня» (redesign 2026-11-14): the wave, the big place for what is read while playing (lyrics,
- * chord chart, tab or notes), an optional panel in the neck's place, one row of controls.
+ * The player: the song's strip, its timeline, the view (chords, lyrics, tab, notes), one panel
+ * under it (the neck, the mixer or an editor), the options on the right, the transport below.
+ * Big here is only what is read with the guitar in hand; the rest is 12–14 px.
  */
-.song {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+
+.player {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
-  padding: 0.75rem 1.25rem 0;
 }
 
-.song--empty {
-  justify-content: center;
-  padding: 2.5rem 1.25rem;
+.player--empty {
+  grid-template-rows: minmax(0, 1fr);
 }
 
-.song__message {
+/* ---------- the song's strip ---------- */
+
+.phead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  height: 2.75rem;
+  padding: 0 0.5rem 0 1rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.phead__song {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.75rem;
-  max-width: 40rem;
-  margin: 0 auto;
+  align-items: baseline;
+  gap: 0.625rem;
+  min-width: 0;
 }
 
-.song__message h1 {
-  font-size: 1.75rem;
+.phead__title {
+  overflow: hidden;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.song__message p {
-  margin: 0;
+.phead__artist {
+  flex: 0 2 auto;
+  min-width: 2rem;
+  overflow: hidden;
   color: var(--text-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* ---------- the wave ---------- */
-.wave {
-  display: block;
+.phead__facts {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.phead__fact {
   flex: none;
+  padding: 0 0.125rem;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+}
+
+.phead__fact b {
+  color: var(--text);
+  font-size: var(--fs-md);
+  font-weight: 500;
+}
+
+.phead__busy {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.phead__busy--cold {
+  color: var(--cold);
+}
+
+/* ---------- the timeline ---------- */
+
+.timeline {
+  display: block;
   width: 100%;
-  height: 4.25rem;
-  border-radius: var(--r);
-  background: var(--surface);
+  height: 4.75rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--well);
   cursor: pointer;
   touch-action: none;
 }
 
-/* ---------- the main place ---------- */
-.song__main {
+/* ---------- the body: the view, the dock, the options ---------- */
+
+.player__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 0;
+}
+
+.player__stage {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.player__view {
   position: relative;
-  display: flex;
-  flex: 1 1 0;
-  flex-direction: column;
+  min-width: 0;
   min-height: 0;
+  overflow: hidden;
+  container-type: size;
 }
 
-.song__views {
+.dock {
+  min-width: 0;
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+}
+
+/* The view's own small tools, in its top right corner. */
+.view-tools {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  z-index: 2;
   display: flex;
-  flex: none;
   align-items: center;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  height: 2.5rem;
+  gap: 0.25rem;
 }
 
-.song__main > :last-child {
-  flex: 1 1 0;
-  min-height: 0;
+.empty__bar {
+  width: 12rem;
+  margin-top: 0.25rem;
 }
 
-/* ---------- «Аккорды»: the chart ---------- */
+/* ---------- chords: a chart of four bars a row ---------- */
+
 .chart {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  padding: 0.5rem 1.25rem 0 0;
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent);
-  mask-image: linear-gradient(to bottom, #000 82%, transparent);
-}
-
-.chart--empty {
-  justify-content: center;
-  color: var(--text-3);
-  -webkit-mask-image: none;
-  mask-image: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.5rem), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 2.5rem), transparent);
 }
 
 .chart__row {
   display: grid;
   flex: none;
-  grid-template-columns: 7rem minmax(0, 1fr);
-}
-
-.chart__row--prev {
-  height: 3rem;
-  opacity: 0.45;
-}
-
-.chart__row--now {
-  height: 6.5rem;
-  margin: 0.25rem 0 0.75rem;
-}
-
-.chart__row--next {
-  height: 3.75rem;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
 }
 
 .chart__section {
-  align-self: center;
-  padding-right: 1rem;
-  overflow: hidden;
-  color: var(--text-3);
-  font-size: 0.875rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  min-width: 0;
+  padding: 0.375rem 0.75rem 0 0.75rem;
 }
 
-.chart__row--now .chart__section {
-  color: var(--text-2);
+.chart__section span {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--sec, var(--text-2));
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chart__bars {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-right: 1px solid var(--line-2);
+  box-shadow: inset 2px 0 0 var(--sec, transparent);
 }
 
 .chart__bar {
   position: relative;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   min-width: 0;
-  padding: 0 0.75rem;
+  padding: 0.25rem 0.875rem 0.5rem;
   border-left: 1px solid var(--line-2);
-  transition: background-color 0.12s var(--ease);
-}
-
-.chart__bar:not(.chart__bar--empty):last-child {
-  border-right: 1px solid var(--line-2);
-}
-
-.chart__bar--empty {
-  border-left-color: transparent;
-}
-
-.chart__bar:not(.chart__bar--empty) + .chart__bar--empty {
-  border-left-color: var(--line-2);
-}
-
-.chart__bar[data-now='1'] {
-  border-radius: var(--r-sm);
-  background: var(--accent-soft);
 }
 
 .chart__num {
-  position: absolute;
-  top: 0.25rem;
-  left: 0.375rem;
   color: var(--text-3);
-  font-size: 0.6875rem;
+  font-size: var(--fs-xs);
+  line-height: 1.3;
 }
 
 .chart__beats {
   display: grid;
+  flex: 1;
   align-items: center;
-  width: 100%;
+  column-gap: 0.5rem;
+  min-width: 0;
 }
 
 .chart__chord {
-  justify-self: start;
-  padding: 0 0.125rem;
+  min-width: 0;
+  padding: 0;
   border: 0;
-  border-radius: 4px;
   background: none;
   color: inherit;
   font-family: var(--font-num);
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1;
+  text-align: left;
   white-space: nowrap;
+  transition: color 0.1s linear;
 }
 
 .chart__chord:disabled {
@@ -184,45 +229,82 @@
 }
 
 .chart__chord:not(:disabled):hover {
-  background: var(--raised);
+  color: var(--accent-hover);
 }
 
 .chart__chord.is-edit {
-  outline: 2px solid var(--cold);
-  outline-offset: 2px;
+  color: var(--cold);
 }
 
-.chart__row--now .chart__chord {
-  color: var(--text);
-  font-size: clamp(1.75rem, 2.8vw, 3rem);
+/* Play by ear: a change of chord without its name. */
+.chart__dot {
+  display: inline-block;
+  width: 0.4em;
+  height: 0.4em;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: middle;
 }
 
-.chart__row--now .chart__chord.is-now {
-  color: var(--accent);
+.chart__row--prev {
+  height: clamp(1.75rem, 7cqh, 2.5rem);
+  color: var(--text-3);
+  opacity: 0.7;
 }
 
-.chart__row--next .chart__chord {
-  color: var(--text-2);
-  font-size: 1.5rem;
+.chart__row--prev .chart__bars {
+  box-shadow: none;
+}
+
+.chart__row--prev .chart__bar {
+  padding-top: 0;
+  padding-bottom: 0;
+  border-left-color: var(--line);
 }
 
 .chart__row--prev .chart__chord {
-  color: var(--text-3);
-  font-size: 1.25rem;
+  font-size: calc(1rem * var(--fit, 1));
+  font-weight: 500;
 }
 
+/* The row being played: a lit strip, its chords large. */
+.chart__row--now {
+  height: clamp(4.75rem, 25cqh, 8.5rem);
+  margin: 0.125rem 0 0.5rem;
+}
+
+.chart__row--now .chart__bars {
+  border-top: 1px solid var(--line-2);
+  border-bottom: 1px solid var(--line-2);
+  background: var(--panel);
+}
+
+.chart__row--now .chart__section span {
+  font-size: var(--fs);
+}
+
+.chart__row--now .chart__chord {
+  font-size: calc(clamp(2.25rem, 12.5cqh, 4.25rem) * var(--fit, 1));
+}
+
+/* The chord sounding now is amber in the bar that plays (a chord held over bars is written in each). */
+.chart__bar[data-now='1'] .chart__chord.is-now {
+  color: var(--accent);
+}
+
+.chart__bar[data-now='1'] {
+  background: var(--accent-soft);
+}
+
+/* The beats of the bar, filling up as it plays. */
 .chart__ticks {
-  position: absolute;
-  right: 0.75rem;
-  bottom: 0.625rem;
-  left: 0.75rem;
   display: flex;
-  gap: 0.25rem;
+  gap: 4px;
+  height: 3px;
 }
 
 .chart__ticks i {
   flex: 1;
-  height: 3px;
   border-radius: 2px;
   background: var(--line-2);
 }
@@ -231,91 +313,71 @@
   background: var(--accent);
 }
 
-/* «Проверь меня»: what you play fits (warm), almost (neutral), does not (cold). Never red. */
+/* Check me: what the guitar plays against the chord sounding now. */
 .chart__row--now[data-judge='match'] .chart__bar[data-now='1'] {
-  background: rgba(242, 162, 74, 0.24);
+  background: rgba(255, 173, 51, 0.24);
 }
 
 .chart__row--now[data-judge='close'] .chart__bar[data-now='1'] {
-  background: rgba(233, 221, 205, 0.1);
+  background: rgba(217, 220, 225, 0.12);
 }
 
 .chart__row--now[data-judge='miss'] .chart__bar[data-now='1'] {
   background: var(--cold-soft);
 }
 
-/* ---------- «Текст» ---------- */
+.chart__row--next {
+  height: clamp(3rem, 12.5cqh, 4.5rem);
+  color: var(--text-2);
+}
+
+.chart__row--next .chart__chord {
+  font-size: calc(clamp(1.25rem, 5.6cqh, 1.875rem) * var(--fit, 1));
+  font-weight: 500;
+}
+
+/* ---------- lyrics ---------- */
+
 .lyr {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  padding: clamp(0.75rem, 6cqh, 3rem) 1.5rem 0 0;
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent);
-  mask-image: linear-gradient(to bottom, #000 82%, transparent);
-}
-
-.lyr--empty {
-  align-items: flex-start;
-  justify-content: center;
-  gap: 0.75rem;
-  max-width: 44rem;
-  color: var(--text-2);
-  -webkit-mask-image: none;
-  mask-image: none;
-}
-
-.lyr--empty p {
-  margin: 0;
-}
-
-/* «Править текст» sits on the views' line, on the left. */
-.lyr__tools {
-  position: absolute;
-  top: 0;
-  left: 6.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  height: 2.5rem;
-}
-
-.lyr__tools .btn {
-  height: 2rem;
-  font-size: 0.8125rem;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.5rem), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 2.5rem), transparent);
 }
 
 .lyr__note {
-  margin: 0 0 0.75rem 7rem;
+  margin: 0 0 0.5rem 7.5rem;
   color: var(--text-3);
-  font-size: 0.875rem;
-}
-
-.lyr__lines {
-  display: flex;
-  flex-direction: column;
+  font-size: var(--fs-sm);
 }
 
 .lyr__row {
   display: grid;
-  flex: none;
-  grid-template-columns: 7rem minmax(0, 1fr);
+  grid-template-columns: 7.5rem minmax(0, 1fr);
   align-items: end;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.625rem;
 }
 
 .lyr__row--prev {
-  min-height: 2rem;
-  opacity: 0.5;
+  min-height: 1.75rem;
+  color: var(--text-3);
+  opacity: 0.7;
 }
 
 .lyr__row--now {
-  margin: 0.5rem 0 1.25rem;
+  margin: 0.375rem 0 1.25rem;
 }
 
 .lyr__section {
-  padding: 0 1rem 0.3rem 0;
+  padding: 0 0.75rem 0.3rem 0.75rem;
   overflow: hidden;
   color: var(--text-3);
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -338,15 +400,16 @@
 }
 
 .lyr__row--now {
-  --max: clamp(1.75rem, 2.8vw, 3rem);
+  --max: clamp(1.75rem, 2.9vw, 3rem);
 }
 
 .lyr__row--next {
   --max: 1.375rem;
+  color: var(--text-2);
 }
 
 .lyr__row--prev {
-  --max: 1.125rem;
+  --max: 1.0625rem;
 }
 
 .lyr__piece {
@@ -364,12 +427,8 @@
 }
 
 .lyr__row--now .lyr__text {
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.2;
-}
-
-.lyr__row--now .lyr__chord {
-  color: var(--text);
 }
 
 .lyr__row--now .lyr__chord.is-now {
@@ -380,17 +439,9 @@
   color: var(--text-3);
 }
 
-.lyr__row--next {
-  color: var(--text-2);
-}
-
 .lyr__row--next .lyr__chord {
   color: var(--text-3);
   font-size: 0.72em;
-}
-
-.lyr__row--prev {
-  color: var(--text-3);
 }
 
 .lyr__row--prev .lyr__chord {
@@ -399,52 +450,245 @@
 
 .lyr__bare {
   color: var(--text-3);
-  font-weight: 400;
+  font-style: normal;
 }
 
+/* Between sung lines: the chord playing, and the next one. */
 .lyr__row--gap .lyr__line {
   align-items: baseline;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .lyr__gapchord {
   color: var(--accent);
   font-family: var(--font-num);
+  font-size: clamp(2.5rem, 4vw, 4rem);
   font-weight: 600;
+  line-height: 1.1;
 }
 
 .lyr__gapnext {
-  color: var(--text-3);
-  --max: 1.25rem;
+  color: var(--text-2);
+  font-family: var(--font-num);
+  font-size: 1.5rem;
 }
 
-/* ---------- the panel in the neck's place ---------- */
-.song__panel {
-  flex: none;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-}
+/* ---------- tab ---------- */
 
-.song__panel > * {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.neck {
-  display: grid;
-  grid-template-columns: 9rem minmax(0, 1fr);
-  gap: 1rem;
-  align-items: center;
-  padding: 0.75rem 1rem 0.5rem 1.25rem;
-}
-
-.neck__label {
+.tabview {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+
+.tabview .view-tools {
+  position: static;
+  flex: none;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  height: 2.25rem;
+  padding: 0 0.5rem 0 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.tabview__name {
+  margin-right: auto;
+  overflow: hidden;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tabview__part {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
   gap: 0.375rem;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+}
+
+.tabview__part select {
+  max-width: 14rem;
+  height: var(--h-sm);
+  font-size: var(--fs-sm);
+}
+
+.tabview__scroll {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 5rem;
+  padding: 0 0.5rem;
+  overflow: hidden;
+  /* alphaTab puts its cursor at z-index 1000: kept inside, or it shows through the start screen,
+     the tuner and every other layer above the song. */
+  isolation: isolate;
+}
+
+/* alphaTab's cursor and highlights in our colours (never red). */
+.tabview .at-cursor-bar {
+  background: rgba(255, 173, 51, 0.08);
+}
+
+.tabview .at-cursor-beat {
+  width: 2px;
+  background: var(--accent);
+}
+
+.tabview .at-highlight * {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+
+/* ---------- notes ---------- */
+
+.notes {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  height: 100%;
+}
+
+.notes__now {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.375rem;
+  min-width: 0;
+  padding: 0 1rem;
+  border-right: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.notes__name {
+  color: var(--accent);
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.notes__next {
+  color: var(--text-2);
+  font-size: var(--fs-md);
+}
+
+.notes__phrase-no {
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+}
+
+.lane {
+  position: relative;
+  overflow: hidden;
+  background: var(--well);
+}
+
+.lane__empty {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  color: var(--text-3);
+}
+
+.lane__strip {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  will-change: transform;
+}
+
+.lane__bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding-left: 5px;
+  border-left: 1px solid var(--line);
+  color: var(--text-3);
+  font: 400 var(--fs-xs) / 1.6 var(--font-num);
+}
+
+.lane__playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--text);
+  pointer-events: none;
+}
+
+.notes__lane {
+  container-type: size;
+}
+
+.notes__note {
+  position: absolute;
+  min-width: 1.5rem;
+  height: 1.375rem;
+  padding: 0 4px;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--control-active);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-family: var(--font-num);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  line-height: 1.375rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.notes__note:hover {
+  background: #4a4e56;
+}
+
+.notes__note--now {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.notes__note--edit {
+  outline: 2px solid var(--cold);
+}
+
+/* The phrases: faint bands under the notes, numbered. */
+.notes__band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--text-3);
+  font: 400 var(--fs-xs) / 1.6 var(--font-num);
+  text-align: right;
+  pointer-events: none;
+}
+
+.notes__band--now {
+  background: rgba(255, 173, 51, 0.06);
+}
+
+/* ---------- the neck ---------- */
+
+.neck {
+  position: relative;
+  display: grid;
+  grid-template-columns: 11.5rem minmax(0, 1fr);
+  height: clamp(9.5rem, 23vh, 13rem);
+  padding: 0.5rem 2rem 0.25rem 0;
+}
+
+.neck__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0 0.75rem 0 1rem;
 }
 
 .neck__name {
@@ -453,17 +697,37 @@
   line-height: 1;
 }
 
-.neck__caption {
-  display: flex;
+.neck__shapes {
+  display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  color: var(--text-3);
-  font-size: 0.8125rem;
+  gap: 2px;
+  color: var(--text-2);
+  font-size: var(--fs);
 }
 
-/* ---------- the neck ---------- */
+.neck__caption {
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+}
+
+.neck__views {
+  max-width: 100%;
+}
+
+.neck__views > button {
+  padding: 0 0.4375rem;
+  font-size: var(--fs-xs);
+}
+
+.neck__close {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+}
+
 .fret {
-  height: clamp(9.5rem, 22vh, 13rem);
+  min-width: 0;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -472,39 +736,46 @@
 }
 
 .fret__wire {
-  stroke: rgba(239, 233, 222, 0.14);
-  stroke-width: 1.5;
+  stroke: #9a9da6;
+  stroke-width: 2;
+  opacity: 0.75;
 }
 
 .fret__nut {
-  stroke: #cfc6b8;
-  stroke-width: 4;
+  stroke: #e6dfd0;
+  stroke-width: 5;
 }
 
 .fret__string {
-  stroke: rgba(239, 233, 222, 0.34);
+  stroke: #cfd2d8;
+  opacity: 0.85;
+}
+
+.fret__string--wound {
+  stroke: #c2ad86;
 }
 
 .fret__inlay {
-  fill: rgba(239, 233, 222, 0.1);
+  fill: rgba(236, 232, 222, 0.38);
 }
 
 .fret__num {
   fill: var(--text-3);
-  font-size: 12px;
+  font-family: var(--font-num);
+  font-size: 11px;
   text-anchor: middle;
 }
 
 .fret__capo {
-  fill: var(--text-2);
+  fill: #d5d7dc;
 }
 
 .fret__scale {
-  fill: rgba(239, 233, 222, 0.24);
+  fill: rgba(233, 234, 236, 0.4);
 }
 
 .fret__tone circle {
-  fill: var(--raised-2);
+  fill: var(--panel-2);
   stroke: var(--accent);
   stroke-width: 1.5;
 }
@@ -539,6 +810,7 @@
 .fret__finger circle,
 .fret__barre {
   fill: var(--accent);
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.55));
 }
 
 .fret__finger text {
@@ -546,7 +818,7 @@
 }
 
 .fret__open {
-  fill: none;
+  fill: var(--panel);
   stroke: var(--accent);
   stroke-width: 2;
 }
@@ -559,7 +831,7 @@
 }
 
 .fret__played {
-  animation: kv-fade 2s linear forwards;
+  animation: note-fade 2s linear forwards;
 }
 
 .fret__played--chord {
@@ -574,13 +846,13 @@
   fill: var(--cold);
 }
 
-/* «Совпало»: the note you played is the recording's or the tab's note — a soft glow, no score. */
+/* The note you played is the recording's or the tab's note: a soft light, no score. */
 .fret__played--match {
-  fill: #fff4e3;
-  filter: drop-shadow(0 0 6px rgba(242, 162, 74, 0.8));
+  fill: #fff3dc;
+  filter: drop-shadow(0 0 6px rgba(255, 173, 51, 0.85));
 }
 
-@keyframes kv-fade {
+@keyframes note-fade {
   from {
     opacity: 0.95;
   }
@@ -590,9 +862,10 @@
   }
 }
 
-/* The tab's or the recording's notes on the neck: now warm, the next one faint. */
+/* The tab's or the recording's notes on the neck: now amber, the next one faint. */
 .fret__tab circle {
   fill: var(--accent);
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.55));
 }
 
 .fret__tab text {
@@ -604,311 +877,25 @@
   stroke: var(--accent);
   stroke-width: 1.5;
   stroke-dasharray: 4 3;
-  opacity: 0.55;
+  opacity: 0.6;
+  filter: none;
 }
 
-/* ---------- the bottom row ---------- */
-.transport {
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: 0.75rem;
-  height: 3.75rem;
-  min-width: 0;
-  margin: 0 -1.25rem;
-  padding: 0 1.25rem;
-  border-top: 1px solid var(--line);
-  white-space: nowrap;
-}
+/* ---------- the mixer: a console ---------- */
 
-.transport__play {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 0;
-  border-radius: var(--r);
-  background: var(--accent);
-  color: var(--accent-ink);
-  transition:
-    background-color 0.15s var(--ease),
-    transform 0.12s var(--ease);
-}
-
-.transport__play:hover {
-  background: var(--accent-hover);
-}
-
-.transport__play:active {
-  transform: scale(0.97);
-}
-
-.transport__play:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.transport__play svg {
-  width: 1.125rem;
-  height: 1.125rem;
-}
-
-.transport__clock {
-  display: flex;
-  flex: none;
-  align-items: baseline;
-  gap: 0.375rem;
-  min-width: 10rem;
-}
-
-.transport__time {
-  font-size: 1.25rem;
-  font-weight: 500;
-}
-
-.transport__total,
-.transport__bar {
-  color: var(--text-3);
-  font-size: 0.8125rem;
-}
-
-.transport__bar {
-  margin-left: 0.375rem;
-}
-
-.transport__sep {
-  flex: none;
-  width: 1px;
-  height: 1.5rem;
-  background: var(--line);
-}
-
-.tvalue {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: 0.375rem;
-  height: 2rem;
-  padding: 0 0.5rem;
-  border: 0;
-  border-radius: var(--r-sm);
-  background: none;
-  font-size: 0.875rem;
-  transition: background-color 0.15s var(--ease);
-}
-
-.tvalue:hover {
-  background: var(--surface);
-}
-
-.tvalue__label {
-  color: var(--text-3);
-}
-
-.tvalue b {
-  font-size: 0.9375rem;
-  font-weight: 500;
-}
-
-.tvalue--on b {
-  color: var(--accent);
-}
-
-.transport .btn {
-  flex: none;
-  height: 2rem;
-}
-
-.transport__tags {
-  display: flex;
-  flex: 1 1 auto;
-  gap: 0.375rem;
-  min-width: 0;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(to left, transparent, #000 1.5rem);
-  mask-image: linear-gradient(to left, transparent, #000 1.5rem);
-}
-
-.tag--button {
-  flex: none;
-  border: 0;
-  cursor: pointer;
-  transition: background-color 0.15s var(--ease);
-}
-
-.tag--button:hover {
-  background: var(--raised-2);
-  color: var(--text);
-}
-
-.tag--mark button {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-}
-
-.tag__x {
-  margin-left: 0.25rem;
-  color: var(--text-3);
-}
-
-.tag--on {
-  color: var(--accent);
-}
-
-.tag--cold {
-  background: var(--cold-soft);
-  color: var(--cold);
-}
-
-.btn--cold {
-  color: var(--cold);
-}
-
-/* «Гитара» and «Песня»: always there, small. */
-.vols {
-  display: inline-flex;
-  flex: none;
-  gap: 1rem;
-}
-
-.vol {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--text-3);
-  font-size: 0.8125rem;
-}
-
-.vol input {
-  width: clamp(3.5rem, 5vw, 6.5rem);
-}
-
-.vol__db {
-  min-width: 3.2em;
-  font-family: var(--font-num);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ---------- «Настройки» ---------- */
-.opts {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.25rem 2rem;
-  padding: 1rem 1.25rem;
-}
-
-.opts__title {
-  margin-bottom: 0.25rem;
-  color: var(--text-3);
-  font-size: 0.8125rem;
-  font-weight: 500;
-}
-
-.opt {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 0.75rem;
-  width: calc(100% + 1rem);
-  height: 2.125rem;
-  margin: 0 -0.5rem;
-  padding: 0 0.5rem;
-  border: 0;
-  border-radius: var(--r-sm);
-  background: none;
-  font-size: 0.875rem;
-  text-align: left;
-  transition: background-color 0.15s var(--ease);
-}
-
-.opt:not(:disabled):hover {
-  background: var(--raised);
-}
-
-.opt:disabled {
-  cursor: default;
-}
-
-.opt__label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.opt__value {
-  color: var(--text-3);
-}
-
-.opt__value--on {
-  color: var(--accent);
-}
-
-.opts__keys {
-  display: flex;
-  flex-wrap: wrap;
-  grid-column: 1 / -1;
-  gap: 0.375rem 1.25rem;
-  margin-top: 0.5rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--line);
-  color: var(--text-3);
-  font-size: 0.8125rem;
-}
-
-.opts__key {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.opts__key kbd + :not(kbd) {
-  margin-left: 0.125rem;
-}
-
-/* ---------- «Дорожки» ---------- */
 .mixer {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-}
-
-.mixer__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1.25rem;
-}
-
-.mixer__head h2 {
-  font-size: 1rem;
-}
-
-.mixer__fold {
-  color: inherit;
-  font-size: inherit;
-}
-
-.mixer__hint {
-  color: var(--text-3);
-  font-size: 0.8125rem;
+  height: clamp(12rem, 30vh, 15rem);
 }
 
 .mixer__status {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.375rem 1rem;
-  margin: 0;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
   color: var(--text-2);
-  font-size: 0.875rem;
-}
-
-.mixer__status--busy {
-  color: var(--text);
+  font-size: var(--fs);
 }
 
 .mixer__status--error {
@@ -916,128 +903,296 @@
 }
 
 .strips {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.stripbtn {
+  display: flex;
   flex: 1;
-  height: 1.75rem;
-  border: 1px solid var(--line-2);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  font-size: 0.8125rem;
+  gap: 1px;
+  min-height: 0;
+  background: var(--line);
 }
 
-.stripbtn:hover {
-  background: var(--raised);
+.strips::after {
+  flex: 1;
+  background: var(--panel);
+  content: '';
 }
 
-.stripbtn--on {
-  border-color: transparent;
-  background: var(--raised-2);
-  color: var(--accent);
-}
-
-/* ---------- chord and note editors (above the panel) ---------- */
-.chordedit {
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--cold);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-}
-
-.chordedit__head,
-.chordedit__row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+.strip {
+  position: relative;
+  display: grid;
+  flex: 0 1 7.5rem;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  justify-items: center;
   gap: 0.375rem;
+  min-width: 4.25rem;
+  padding: 0.5rem 0.375rem 0.375rem;
+  border-top: 2px solid var(--stem);
+  background: var(--panel);
 }
 
-.chordedit__what {
-  margin-right: 0.5rem;
-  font-family: var(--font-num);
-  font-size: 1.25rem;
+.strip__name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.strip__ms {
+  display: flex;
+  gap: 3px;
+}
+
+.strip__btn {
+  width: 1.5rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--control);
+  color: var(--text-3);
+  font: 600 var(--fs-xs) / 1 var(--font-num);
+  transition:
+    background-color 0.12s var(--ease),
+    color 0.12s var(--ease);
+}
+
+.strip__btn:hover {
+  color: var(--text);
+}
+
+.strip__btn.is-on {
+  border-color: transparent;
+  background: var(--cold);
+  color: #0c1a24;
+}
+
+.strip__btn--solo.is-on {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.strip__fader {
+  display: flex;
+  align-items: stretch;
+  gap: 0.375rem;
+  min-height: 0;
+  padding: 0.125rem 0;
+}
+
+.strip__meter {
+  display: flex;
+  align-items: flex-end;
+  width: 5px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: var(--well);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.strip__meter i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--stem);
+  transform: scaleY(0);
+  transform-origin: bottom;
+}
+
+.strip__db {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: 1.2;
+}
+
+.strip--silent .strip__name {
+  color: var(--text-3);
+}
+
+.strip--silent .strip__meter i {
+  background: var(--text-3);
+}
+
+.strip--silent {
+  border-top-color: var(--control-active);
+}
+
+/* ---------- the options panel ---------- */
+
+.opts {
+  display: flex;
+  flex-direction: column;
+  width: 19rem;
+  min-height: 0;
+  border-left: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.opts__body {
+  min-height: 0;
+  padding: 0 0.75rem 1rem;
+  overflow-y: auto;
+}
+
+.opts__group {
+  padding: 0.625rem 0 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.opts__group:last-child {
+  border-bottom: 0;
+}
+
+.opts__title {
+  margin-bottom: 0.125rem;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
   font-weight: 600;
 }
 
-.chordedit__act,
-.chordedit__btn {
+.opts .switch {
+  display: flex;
+  width: 100%;
+  min-height: 2rem;
+}
+
+.opts .row {
+  min-height: 2rem;
+  padding: 0;
+}
+
+.opts .row__control {
+  max-width: 70%;
+}
+
+.opts .row__control .switch {
+  width: auto;
+}
+
+.opts__value {
+  overflow: hidden;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.opts__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  padding: 0.375rem 0 0.25rem;
+}
+
+.opts__mark {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.opts__go {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 0;
+  height: var(--h);
+  padding: 0 0.375rem;
+  border: 0;
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+
+.opts__go:hover {
+  background: var(--control);
+  color: var(--text);
+}
+
+.opts__markname {
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--fs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- editors, in the dock ---------- */
+
+.editor {
+  display: flex;
+  flex-direction: column;
+}
+
+.editor .panel-head__title {
+  margin-right: 0.25rem;
+}
+
+.editor__what {
+  margin-right: auto;
+  color: var(--text);
+  font-size: var(--fs-md);
+}
+
+.editor__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.625rem 0.75rem 0.75rem;
+}
+
+.editor__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.keybtn {
+  min-width: 2.5rem;
   height: 2rem;
-  padding: 0 0.75rem;
-  border: 1px solid var(--line-2);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  font-size: 0.875rem;
-  transition: background-color 0.15s var(--ease);
+  padding: 0 0.625rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--control);
+  color: var(--text);
+  font: 500 var(--fs-md) / 1 var(--font-num);
+  white-space: nowrap;
+  transition: background-color 0.12s var(--ease);
 }
 
-.chordedit__act:hover,
-.chordedit__btn:hover {
-  background: var(--raised);
+.keybtn:hover {
+  background: var(--control-hover);
 }
 
-.chordedit__btn {
-  min-width: 2.75rem;
-  font-family: var(--font-num);
-}
-
-.chordedit__btn--on {
-  border-color: transparent;
-  background: var(--raised-2);
-  color: var(--accent);
-}
-
-.chordedit__act:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-.chordedit__done {
-  margin-left: auto;
+.keybtn.is-on {
   border-color: transparent;
   background: var(--accent);
   color: var(--accent-ink);
 }
 
-.chordedit__done:hover {
-  background: var(--accent-hover);
-}
-
-/* ---------- the lyrics editor (in the panel) ---------- */
 .lyrics-editor {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+  grid-template-columns: minmax(0, 1fr) 17rem;
   gap: 0.75rem;
-  min-height: 0;
-  padding: 0.75rem 1rem;
-}
-
-.song__panel > .lyrics-editor {
-  border-left: 3px solid var(--cold);
+  height: clamp(11rem, 36vh, 20rem);
+  padding: 0.75rem;
 }
 
 .lyrics-editor__text {
-  min-height: 9rem;
-  padding: 0.625rem 0.75rem;
+  height: 100%;
+  font: 400 var(--fs-md) / 1.5 ui-monospace, Consolas, monospace;
   resize: none;
-  border: 1px solid var(--line-2);
-  border-radius: var(--r);
-  background: var(--bg);
-  color: var(--text);
-  font: 0.8125rem/1.4 ui-monospace, Consolas, 'Cascadia Mono', monospace;
+  white-space: pre;
 }
 
 .lyrics-editor__side {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .lyrics-editor__buttons {
@@ -1046,311 +1201,212 @@
   gap: 0.375rem;
 }
 
-.lyrics-editor__buttons .chip {
-  font-size: 0.8125rem;
-}
+/* ---------- the transport ---------- */
 
-/* ---------- «Табы» ---------- */
-.tabview {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
-  padding: 0.25rem 0.5rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-}
-
-.tabview--empty {
-  justify-content: center;
-  padding: 0 1rem;
-}
-
-.tabview--empty p {
-  margin: 0;
-  color: var(--text-3);
-  font-size: 0.875rem;
-}
-
-.tabview__scroll {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 5rem;
-  overflow: hidden;
-  /* alphaTab puts its cursor at z-index 1000: kept inside, or it shows through the start screen,
-     the big tuner and every other layer above the song. */
-  isolation: isolate;
-}
-
-.tabview__bar {
+.transport {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  color: var(--text-3);
-  font-size: 0.75rem;
+  min-width: 0;
+  height: 3.5rem;
+  padding: 0 0.75rem;
+  border-top: 1px solid var(--line);
+  background: var(--panel);
 }
 
-.tabview__name {
-  max-width: 30%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tabview__error {
-  color: var(--cold);
-}
-
-
-.tabview__bar .chip {
-  font-size: 0.75rem;
-}
-
-/* The part on screen: a list as small as the buttons beside it. */
-.tabview__part {
-  display: inline-flex;
-  flex: none;
+.transport__group {
+  display: flex;
   align-items: center;
+  flex: none;
   gap: 0.375rem;
 }
 
-.tabview__part select {
-  max-width: 12rem;
-  padding: 0.125rem 0.375rem;
-  border: 1px solid var(--line-2);
-  border-radius: var(--r);
-  background: var(--surface);
-  color: var(--text);
-  cursor: pointer;
-  transition: background-color 0.15s var(--ease);
-}
-
-.tabview__part select:hover {
-  background: var(--raised);
-}
-
-.tabview__part option {
-  background: var(--raised);
-  color: var(--text);
-}
-
-/* alphaTab's cursor and highlights in our colours (never red). */
-.tabview .at-cursor-bar {
-  background: rgba(242, 162, 74, 0.08);
-}
-
-.tabview .at-cursor-beat {
-  width: 2px;
-  background: var(--accent);
-}
-
-.tabview .at-highlight * {
-  fill: var(--accent);
-  stroke: var(--accent);
-}
-
-/* ---------- «Ноты» ---------- */
-.notes {
-  display: grid;
-  grid-template-columns: 7rem minmax(0, 1fr);
-  gap: 0.75rem;
-}
-
-.notes .chords__now {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.25rem;
-  padding: 0 1rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-}
-
-.notes .chords__name {
-  color: var(--accent);
-  font-family: var(--font-num);
-  font-size: 2.25rem;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.notes .chords__next {
-  color: var(--text-3);
-  font-size: 0.8125rem;
-}
-
-.lane {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-}
-
-.lane__empty {
-  margin: 0;
-  padding: 1rem 1.25rem;
-  color: var(--text-3);
-}
-
-.lane__strip {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  will-change: transform;
-}
-
-.lane__bar {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  padding-left: 4px;
-  border-left: 1px solid var(--line);
-  color: var(--text-3);
-  font-size: 0.6875rem;
-  line-height: 1.6;
-}
-
-.lane__playhead {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  margin-left: -1px;
-  background: var(--accent);
-  pointer-events: none;
-}
-
-.notes__lane {
-  container-type: size;
-}
-
-.notes__note {
-  position: absolute;
-  min-width: 1.6rem;
+.transport__sep {
+  flex: none;
+  width: 1px;
   height: 1.5rem;
-  padding: 0 3px;
-  overflow: hidden;
-  border-radius: 4px;
-  background: var(--raised-2);
-  color: var(--text);
-  font-family: var(--font-num);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  line-height: 1.5rem;
-  white-space: nowrap;
+  background: var(--line-2);
 }
 
-.notes__note--now {
+.transport__gap {
+  flex: 1;
+}
+
+.transport__play {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-lg);
+  background: var(--primary);
+  color: var(--primary-ink);
+  transition: background-color 0.12s var(--ease);
+}
+
+.transport__play:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.transport__play.is-on {
   background: var(--accent);
   color: var(--accent-ink);
 }
 
-.notes__note--edit {
-  outline: 2px solid var(--cold);
+.transport__play:disabled {
+  opacity: 0.4;
 }
 
-/* The phrases: faint bands under the notes, numbered. */
-.notes__band {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  padding: 2px 6px;
-  border-radius: var(--r);
-  background: rgba(239, 233, 222, 0.03);
+.transport__clock {
+  min-width: 11rem;
+  height: 2.25rem;
+  line-height: calc(2.25rem - 2px);
+}
+
+.transport__time {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.transport__total {
   color: var(--text-3);
-  font-size: 0.75rem;
-  text-align: right;
-  pointer-events: none;
+  font-size: var(--fs);
 }
 
-.notes__band--now {
-  background: rgba(242, 162, 74, 0.05);
-}
-
-.notes__phrase-no {
-  color: var(--text-3);
-}
-
-/* ---------- «Сцена»: the whole screen, readable from two metres ---------- */
-.stage {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3vh;
-  padding: 4vh 4vw;
-  background: var(--bg);
-}
-
-.stage__chords {
-  display: flex;
-  align-items: baseline;
-  gap: 4vw;
-}
-
-.stage__now {
-  color: var(--accent);
-  font-family: var(--font-num);
-  font-size: max(160px, 22vh);
-  font-weight: 600;
-  line-height: 1;
-}
-
-.stage__next {
+.transport__bar {
+  margin-left: auto;
+  padding-left: 0.75rem;
   color: var(--text-2);
-  font-family: var(--font-num);
-  font-size: max(64px, 7vh);
-  font-weight: 500;
+  font-size: var(--fs);
 }
 
-.stage__lyrics {
-  width: 100%;
-  text-align: center;
+.transport__loop {
+  height: var(--h-lg);
 }
 
-.stage__line {
-  display: -webkit-box;
-  margin: 0;
+.transport__count {
+  width: 2.5rem;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.transport .stepper {
+  height: var(--h-lg);
+}
+
+.tfield {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.tfield__label {
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+}
+
+.transport__modes {
+  display: flex;
+  flex: 0 1 auto;
+  gap: 0.25rem;
+  min-width: 0;
   overflow: hidden;
-  color: var(--text);
-  font-size: max(64px, 7.5vh);
-  font-weight: 500;
-  line-height: 1.1;
-  text-wrap: balance;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
 }
 
-.stage__line--next {
+.transport__guitar {
+  flex: none;
+  height: var(--h-lg);
+}
+
+.vols {
+  display: flex;
+  flex: none;
+  gap: 0.75rem;
+}
+
+.vol {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
   color: var(--text-3);
-  font-size: max(40px, 4.5vh);
-  font-weight: 400;
 }
 
-.stage__tab {
-  width: 100%;
+.vol input {
+  width: 5rem;
 }
 
-.stage__tab .tabview__scroll {
-  height: 30vh;
+.vol__db {
+  width: 2.75rem;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
 }
 
-.stage__hint {
-  position: absolute;
-  bottom: 2vh;
-  margin: 0;
-  color: var(--text-3);
-  font-size: 0.8125rem;
+.iconbtn.is-cold {
+  color: var(--cold);
 }
 
-/* ---------- printing: only the lyrics with chords, black on white ---------- */
+/* Narrower windows: the transport keeps one line. */
+@media (max-width: 1640px) {
+  .vol__db {
+    display: none;
+  }
+
+  .transport__clock {
+    min-width: 9.5rem;
+  }
+}
+
+@media (max-width: 1460px) {
+  .tfield__label {
+    display: none;
+  }
+
+  .transport {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 1340px) {
+  .vol input {
+    width: 3.5rem;
+  }
+
+  .transport .stepper__value {
+    min-width: 2.5rem;
+  }
+
+  .transport__clock {
+    min-width: 0;
+  }
+
+  .transport__total {
+    display: none;
+  }
+}
+
+/* Low windows: the timeline and the neck give their height to the view. */
+@media (max-height: 800px) {
+  .timeline {
+    height: 4rem;
+  }
+
+  .transport {
+    height: 3.25rem;
+  }
+
+  .neck {
+    height: 9rem;
+  }
+
+  .mixer {
+    height: 11.5rem;
+  }
+}
+
+/* ---------- printing the lyrics ---------- */
+
 .print-lyrics {
   display: none;
 }
@@ -1365,8 +1421,12 @@
     visibility: visible;
   }
 
+  html,
   body,
-  .app {
+  #root,
+  .app,
+  .app__main {
+    display: block;
     height: auto;
     overflow: visible;
     background: #fff;
@@ -1414,97 +1474,4 @@
     padding-right: 0.5em;
     font-size: 10pt;
   }
-}
-
-/* ---------- low screens (1280×720, laptops with 125–150 % scaling) ---------- */
-@media (max-height: 780px) {
-  .song {
-    gap: 0.5rem;
-    padding-top: 0.5rem;
-  }
-
-  .wave {
-    height: 3.5rem;
-  }
-
-  .song__views {
-    height: 2.25rem;
-  }
-
-  .chart__row--now {
-    height: 5.25rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .chart__row--next {
-    height: 3.25rem;
-  }
-
-  .chart__row--prev {
-    height: 2.5rem;
-  }
-
-  .lyr__row--now {
-    margin: 0.25rem 0 0.75rem;
-  }
-
-  .fret {
-    height: 9rem;
-  }
-
-  .transport {
-    height: 3.25rem;
-  }
-}
-
-/* ---------- narrower screens: the bottom row keeps one line ---------- */
-@media (max-width: 1600px) {
-  .vol__db {
-    display: none;
-  }
-
-  .transport__clock {
-    min-width: 8.5rem;
-  }
-}
-
-@media (max-width: 1400px) {
-  .transport {
-    gap: 0.5rem;
-  }
-
-  .vol input {
-    width: 3.5rem;
-  }
-}
-
-/* A bookmark in «Настройки»: its name jumps to it, × deletes it. */
-.opt--mark .opt__go,
-.opt--mark .opt__x {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-}
-
-.opt--mark .opt__x {
-  width: 1.5rem;
-  color: var(--text-3);
-  text-align: center;
-}
-
-.opt--mark .opt__x:hover {
-  color: var(--text);
-}
-
-/* «Снять на слух»: a change of chord without its name. */
-.chart__dot {
-  display: inline-block;
-  width: 0.4em;
-  height: 0.4em;
-  border-radius: 50%;
-  background: currentColor;
-  vertical-align: middle;
 }

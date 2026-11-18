@@ -1,7 +1,8 @@
 // What the song keys and buttons do. They change useSong / useSettings; seeking is the one direct
 // player call (the position is not kept in a store, like engine.start() is called directly).
 import { sectionLabel } from './sections';
-import { getLanguage, L } from '../i18n';
+import { L } from '../i18n';
+import { fileLang } from '../i18n/lang';
 import { sectionAt, snapToBar, stepSection } from '../music/bars';
 import { TUNINGS, TUNING_ORDER } from '../music/tunings';
 import { pollSoon, refreshLibrary, useLibrary } from '../state/library';
@@ -323,19 +324,18 @@ export const songActions = {
     useSong.getState().patch({ voicing: useSong.getState().voicing + 1 });
   },
 
-  /** F: show or hide the neck in the current view; showing it closes «Дорожки» and «Настройки». */
+  /** F: show or hide the neck in the current view; showing it closes the mixer, which sits in its place. */
   toggleNeck(): void {
     const song = useSong.getState().song;
     if (!song) return;
     const view = song.player.view;
     const shown = useSettings.getState().neckShown[view];
-    const covered = useSong.getState().mixerOpen || useRuntime.getState().songSettings;
-    if (shown && covered) {
-      songActions.closePanels();
+    if (shown && useSong.getState().mixerOpen) {
+      useSong.getState().patch({ mixerOpen: false });
       return;
     }
     useSettings.getState().toggleNeck(view);
-    if (!shown) songActions.closePanels();
+    if (!shown) useSong.getState().patch({ mixerOpen: false });
   },
 
   /** Shift+F: the neck must be visible to see what it shows now. */
@@ -343,21 +343,17 @@ export const songActions = {
     const song = useSong.getState().song;
     if (!song) return;
     if (!useSettings.getState().neckShown[song.player.view]) useSettings.getState().toggleNeck(song.player.view);
-    songActions.closePanels();
-  },
-
-  /** «Настройки» of the song: open in the neck's place, or closed again. */
-  toggleSettings(): void {
-    const open = !useRuntime.getState().songSettings;
     useSong.getState().patch({ mixerOpen: false });
-    useRuntime.getState().patch({ songSettings: open });
   },
 
-  /** «Дорожки»: the mixer in the neck's place, or closed again. */
+  /** The song's options: the panel on the right, open or closed. */
+  toggleSettings(): void {
+    useRuntime.getState().patch({ songSettings: !useRuntime.getState().songSettings });
+  },
+
+  /** The mixer in the neck's place, or closed again. */
   toggleMixer(): void {
-    const open = !useSong.getState().mixerOpen;
-    useRuntime.getState().patch({ songSettings: false });
-    useSong.getState().patch({ mixerOpen: open });
+    useSong.getState().patch({ mixerOpen: !useSong.getState().mixerOpen });
   },
 
   closePanels(): void {
@@ -450,7 +446,7 @@ export const songActions = {
     toast(L().actions.export.making);
     try {
       // The language names the file the service builds.
-      const body = { ...exportBody(song, model, song.player.loop), lang: getLanguage() };
+      const body = { ...exportBody(song, model, song.player.loop), lang: fileLang() };
       const { blob, fileName } = await api.exportMp3(song.id, body);
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);

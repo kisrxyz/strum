@@ -55,40 +55,41 @@ export function ChordEditor({ song, analysis }: { song: Song; analysis: Analysis
   };
 
   return (
-    <section className="chordedit" aria-label={e.label}>
-      <div className="chordedit__head">
-        <span className="chordedit__what">
+    <section className="editor" aria-label={e.label}>
+      <div className="panel-head">
+        <span className="panel-head__title">{e.label}</span>
+        <span className="editor__what num">
           {shapeName(seg.chord, song, analysis)} · {fmtTime(seg.start)}–{fmtTime(seg.end)}
         </span>
-        <button type="button" className="chordedit__act" disabled={editIndex === 0} onClick={() => select(track, track[editIndex - 1].start + 0.001)}>
+        <button type="button" className="btn btn--sm btn--ghost" disabled={editIndex === 0} onClick={() => select(track, track[editIndex - 1].start + 0.001)}>
           {t.songUi.prevItem}
         </button>
         <button
           type="button"
-          className="chordedit__act"
+          className="btn btn--sm btn--ghost"
           disabled={editIndex >= track.length - 1}
           onClick={() => select(track, track[editIndex + 1].start + 0.001)}
         >
           {t.songUi.nextItem}
         </button>
-        <button type="button" className="chordedit__act" onClick={() => save(splitAt(track, cutAt(), analysis?.beats ?? []), seg.start + 0.001)}>
+        <button type="button" className="btn btn--sm btn--ghost" onClick={() => save(splitAt(track, cutAt(), analysis?.beats ?? []), seg.start + 0.001)}>
           {e.split}
         </button>
         <button
           type="button"
-          className="chordedit__act"
+          className="btn btn--sm btn--ghost"
           disabled={editIndex === 0}
           onClick={() => save(mergeWithPrevious(track, editIndex), seg.start - 0.001)}
         >
           {e.merge}
         </button>
-        <button type="button" className="chordedit__act" onClick={() => save(setChord(track, editIndex, 'N'), seg.start + 0.001)}>
+        <button type="button" className="btn btn--sm btn--ghost" onClick={() => save(setChord(track, editIndex, 'N'), seg.start + 0.001)}>
           {e.noChord}
         </button>
         {song.chords && (
           <button
             type="button"
-            className="chordedit__act"
+            className="btn btn--sm btn--ghost"
             onClick={() => {
               if (Date.now() > resetUntil) {
                 setResetUntil(Date.now() + 4000);
@@ -101,33 +102,35 @@ export function ChordEditor({ song, analysis }: { song: Song; analysis: Analysis
             {Date.now() < resetUntil ? e.restoreAll : t.songUi.restore}
           </button>
         )}
-        <button type="button" className="chordedit__act chordedit__done" onClick={() => useSong.getState().patch({ editIndex: null })}>
+        <button type="button" className="btn btn--sm btn--primary" onClick={() => useSong.getState().patch({ editIndex: null })}>
           {t.common.done}
         </button>
       </div>
-      <div className="chordedit__row" role="group" aria-label={e.root}>
+      <div className="editor__body">
+      <div className="editor__row" role="group" aria-label={e.root}>
         {Array.from({ length: 12 }, (_, pc) => (
           <button
             type="button"
             key={pc}
-            className={`chordedit__btn${shape?.root === pc ? ' chordedit__btn--on' : ''}`}
+            className={`keybtn keybtn--root${shape?.root === pc ? ' is-on' : ''}`}
             onClick={() => pick(pc, shape?.quality ?? 'maj')}
           >
             {noteName(pc, spelling)}
           </button>
         ))}
       </div>
-      <div className="chordedit__row" role="group" aria-label={e.type}>
+      <div className="editor__row" role="group" aria-label={e.type}>
         {QUALITIES.map((q) => (
           <button
             type="button"
             key={q}
-            className={`chordedit__btn${shape?.quality === q ? ' chordedit__btn--on' : ''}`}
+            className={`keybtn${shape?.quality === q ? ' is-on' : ''}`}
             onClick={() => pick(shape?.root ?? 0, q)}
           >
             {q === 'maj' ? e.major : QUALITY_TEXT[q]}
           </button>
         ))}
+      </div>
       </div>
     </section>
   );

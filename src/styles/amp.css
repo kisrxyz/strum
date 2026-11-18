@@ -1,341 +1,685 @@
-/* ---------- amp screen («Комбик») ---------- */
+/*
+ * The amp: the presets on the left; in the middle the rig, drawn as gear. This is where material
+ * lives (metal, tolex, cloth, paint): the head's panel and knobs, the cabinet, the pedals. A head
+ * takes its look from the family of its amp (`head--black`, `--gold`, `--oxblood`, `--steel`,
+ * `--silver`, `--plain`): the panel, the ink on it, the knobs.
+ */
+
 .amp {
+  display: grid;
+  grid-template-columns: 14rem minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ---------- presets ---------- */
+
+.amp__side {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  width: min(100%, 88rem);
-  margin: 0 auto;
-  padding: 1.25rem 1.5rem;
+  min-height: 0;
+  border-right: 1px solid var(--line);
+  background: var(--panel);
 }
 
-.amp__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem 1.5rem;
-}
-
-.amp__head h1 {
-  font-size: 1.75rem;
-}
-
-/* Preset tiles: quiet; the selected one is raised with an accent hairline. */
 .presets {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  padding: 0.5rem;
+  overflow-y: auto;
 }
 
 .preset {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.25rem;
-  min-width: 0;
-  padding: 0.875rem 1rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-  text-align: left;
-  transition:
-    background-color 0.15s var(--ease),
-    border-color 0.15s var(--ease),
-    transform 0.12s var(--ease);
-}
-
-.preset:hover {
-  border-color: var(--line-2);
-}
-
-.preset:active {
-  transform: scale(0.99);
-}
-
-.preset--on,
-.preset--on:hover {
-  border-color: var(--accent);
-  background: var(--raised);
-}
-
-.preset__top {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
+  flex: none;
   gap: 0.75rem;
+  height: 3.25rem;
+  padding: 0 0.625rem;
+  border: 0;
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--text-2);
+  text-align: left;
+  transition: background-color 0.12s var(--ease);
+}
+
+.preset:hover,
+.preset[aria-pressed='true'] {
+  background: var(--control);
+}
+
+.preset__no {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--well);
+  color: var(--text-3);
+  font-size: var(--fs);
+  font-weight: 500;
+}
+
+.preset[aria-pressed='true'] .preset__no {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.preset__words {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
   min-width: 0;
+}
+
+.preset__name,
+.preset__amp {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .preset__name {
-  min-width: 0;
-  overflow: hidden;
-  font-size: 1.25rem;
-  font-weight: 500;
-  line-height: 1.25;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  transition: color 0.15s var(--ease);
-}
-
-.preset--on .preset__name {
-  color: var(--accent);
+  color: var(--text);
+  font-size: var(--fs-md);
 }
 
 .preset__amp {
-  overflow: hidden;
   color: var(--text-3);
-  font-size: 0.875rem;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  font-size: var(--fs-sm);
 }
 
-/* The amp, cabinet and tone: one panel. */
-.amp__main {
+/* ---------- the rig ---------- */
+
+/* The rig grows with the window (container units): the knobs are as big as the room allows. */
+.amp__rig {
   display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-/* The switches on the right are a column of up to three and a link: the selects sit in its middle,
-   not under an empty band. */
-.amp__sources {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem 1.25rem;
-}
-
-.amp__sources .select {
-  flex: 0 1 15rem;
-}
-
-.amp__sources .select select {
   min-width: 0;
+  min-height: 0;
+  padding: 1.5rem;
+  overflow: auto;
+  container-type: size;
 }
 
-.amp__about {
+.rig {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: 0.125rem;
-  min-width: 10rem;
-  flex: 1 1 12rem;
-  padding-bottom: 0.125rem;
+  gap: clamp(1rem, 2.6cqh, 1.75rem);
+  width: min(100%, 78rem);
+  margin: auto;
 }
 
-.amp__about p {
-  margin: 0;
+.rig__row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.75rem, 1.4cqw, 1.25rem);
 }
 
-.amp__about b {
+/* ---------- the head ---------- */
+
+.head {
+  --plate: linear-gradient(180deg, #2a2b2f, #1b1c1f);
+  --plate-ink: #e9eaec;
+  --plate-line: rgba(255, 255, 255, 0.13);
+  --knob-body: #17181a;
+  --knob-cap: conic-gradient(from 25deg, #7f828a, #e6e7ea 12%, #9a9da5 25%, #5a5d65 38%, #a8abb3 50%, #eeeff1 62%, #999ca4 75%, #5f626a 88%, #7f828a);
+  --knob-mark: #f2f3f5;
+  overflow: hidden;
+  border: 1px solid #000;
+  border-radius: 10px;
+  background: #111214;
+  box-shadow:
+    0 18px 38px rgba(0, 0, 0, 0.45),
+    0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* The top strip: the amp's covering, with its name plate. */
+.head__top {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  height: clamp(3rem, 7cqh, 3.75rem);
+  padding: 0 0.625rem 0 0.875rem;
+  border-bottom: 1px solid #000;
+  background:
+    radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1.3px) 0 0 / 4px 4px,
+    radial-gradient(rgba(0, 0, 0, 0.35) 1px, transparent 1.3px) 2px 2px / 4px 4px,
+    #1b1c1f;
+}
+
+.head__model {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 24rem;
+  height: 2rem;
+  padding: 0 2rem 0 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--r);
+  background: #0b0c0d
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%23a6a9b0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E")
+    no-repeat right 0.75rem center;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
+  color: var(--text);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  appearance: none;
+  cursor: pointer;
+}
+
+.head__note {
+  min-width: 0;
+  overflow: hidden;
   color: var(--text-2);
-  font-weight: 500;
+  font-size: var(--fs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.amp__status {
-  color: var(--text-2);
-  font-size: 0.9375rem;
-}
-
-.amp__status--fallback {
+.head__note--fallback {
   color: var(--cold);
 }
 
-.amp__status--loading {
-  color: var(--text-3);
+.head__gap {
+  flex: 1;
 }
 
-.amp__actions {
+/* The panel: brushed, with its three groups of controls. */
+.head__plate {
+  position: relative;
   display: flex;
+  align-items: flex-start;
+  gap: clamp(0.75rem, 1.6cqw, 1.5rem);
+  padding: clamp(1.25rem, 4.5cqh, 2.5rem) 2rem clamp(0.875rem, 3.2cqh, 1.75rem);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.028) 0 1px, rgba(0, 0, 0, 0.03) 1px 2px),
+    var(--plate);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55);
+  color: var(--plate-ink);
+}
+
+/* A screw at each end of the panel. */
+.head__plate::before,
+.head__plate::after {
+  position: absolute;
+  top: calc(50% - 4px);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d6d8dc, #6b6e75 55%, #2c2e32);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+  content: '';
+}
+
+.head__plate::before {
+  left: 0.625rem;
+}
+
+.head__plate::after {
+  right: 0.625rem;
+}
+
+.head__zone {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(0.625rem, 1.4cqw, 1.5rem);
+}
+
+.head__zone--tone {
+  flex: 1;
+  justify-content: space-evenly;
+  padding: 0 1rem;
+  border-right: 1px solid var(--plate-line);
+  border-left: 1px solid var(--plate-line);
+}
+
+.head__levers {
+  display: flex;
+  gap: 0.875rem;
+  padding-top: 0.5rem;
+}
+
+/* The pilot lamp: lit while the amp plays. */
+.head__lamp {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: 1.5rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #6a5630, #2c220f 70%);
+  box-shadow:
+    0 0 0 2px #0d0e0f,
+    0 0 0 3px rgba(255, 255, 255, 0.18),
+    inset 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.head__lamp[data-on='true'] {
+  background: radial-gradient(circle at 35% 30%, #fff4d6, #ffb845 42%, #c9780f 88%);
+  box-shadow:
+    0 0 0 2px #0d0e0f,
+    0 0 0 3px rgba(255, 255, 255, 0.18),
+    0 0 14px rgba(255, 173, 51, 0.6);
+}
+
+/* The families. */
+.head--gold {
+  --plate: linear-gradient(180deg, #d0ad66, #a98640);
+  --plate-ink: #1d1608;
+  --plate-line: rgba(0, 0, 0, 0.24);
+  --knob-body: #131313;
+  --knob-cap: conic-gradient(from 25deg, #a88a4a, #f3e2b0 12%, #b99a57 25%, #7c6532 38%, #c2a561 50%, #f6e8bd 62%, #b3944f 75%, #7f6833 88%, #a88a4a);
+  --knob-mark: #f6e8bd;
+}
+
+.head--oxblood {
+  --plate: linear-gradient(180deg, #70292f, #4a1b20);
+  --plate-ink: #f3e9d8;
+  --plate-line: rgba(255, 255, 255, 0.16);
+  --knob-body: #efe6d3;
+  --knob-cap: radial-gradient(circle at 40% 30%, #fbf6ea, #d9cdb3);
+  --knob-mark: #2a1711;
+}
+
+.head--steel {
+  --plate: linear-gradient(180deg, #3b3e45, #23252a);
+  --plate-ink: #eceef1;
+  --knob-body: #b4b7be;
+  --knob-cap: conic-gradient(from 25deg, #9da0a8, #f4f5f7 12%, #b1b4bc 25%, #71747c 38%, #babdc5 50%, #f7f8f9 62%, #adb0b8 75%, #74777f 88%, #9da0a8);
+  --knob-mark: #15161a;
+}
+
+.head--silver {
+  --plate: linear-gradient(180deg, #cbced4, #9da1a9);
+  --plate-ink: #15161a;
+  --plate-line: rgba(0, 0, 0, 0.2);
+  --knob-body: #141516;
+  --knob-mark: #ffffff;
+}
+
+.head--plain {
+  --plate: linear-gradient(180deg, #27282c, #1c1d20);
+}
+
+/* ---------- a knob ---------- */
+
+.knob {
+  position: relative;
+  display: inline-flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.25rem;
-  margin-left: auto;
+  color: var(--plate-ink, var(--text));
+  outline: 0;
+  cursor: ns-resize;
+  touch-action: none;
 }
 
-.amp__links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.25rem 1rem;
+.knob__dial {
+  position: relative;
+  display: block;
+  width: clamp(3.5rem, 6.4cqw, 6rem);
+  aspect-ratio: 1;
 }
 
-/* The amp's face: a row of knobs, like the panel of a real amp. */
-.amp__knobs {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1.25rem 0.5rem 0.25rem;
-  border-top: 1px solid var(--line);
+.knob--small .knob__dial {
+  width: clamp(2.75rem, 4.3cqw, 4rem);
 }
 
-/* The master volume is not part of the preset: a hairline sets it apart. */
-.amp__master {
-  padding-left: 1.5rem;
-  border-left: 1px solid var(--line);
-}
-
-/* Effects: three panels, each with its own switch in the head. */
-.effects {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.effect {
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
-}
-
-.effect > .switch {
-  justify-content: space-between;
+.knob__marks {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  margin-bottom: 0.125rem;
-  color: var(--text-2);
-  font-size: 1rem;
-  font-weight: 500;
+  height: 100%;
 }
 
-.effect--on > .switch,
-.effect > .switch:hover {
-  color: var(--text);
+.knob__marks line {
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  opacity: 0.26;
 }
 
-/* A pedal: its switch on top, small knobs in a row under it. */
-.effect__knobs {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-around;
-  gap: 0.5rem;
-  min-height: 5.25rem;
+.knob__marks line.is-lit {
+  opacity: 0.95;
 }
 
-.effect__type {
-  align-self: center;
-  transition: opacity 0.15s var(--ease);
+.knob__body,
+.knob__turn {
+  position: absolute;
+  inset: 15%;
+  border-radius: 50%;
 }
 
-.effect__type--off {
-  opacity: 0.45;
+.knob__body {
+  background:
+    radial-gradient(circle at 50% 28%, rgba(255, 255, 255, 0.18), transparent 62%),
+    var(--knob-body, #17181a);
+  box-shadow:
+    0 3px 5px rgba(0, 0, 0, 0.55),
+    0 1px 1px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5);
 }
 
-/* ---------- mixer strips (song screen, «Дорожки») ---------- */
-.strip {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-  padding: 0.625rem 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  background: var(--bg);
+.knob__body::after {
+  position: absolute;
+  inset: 24%;
+  border-radius: 50%;
+  background: var(--knob-cap, conic-gradient(from 25deg, #7f828a, #e6e7ea 12%, #9a9da5 25%, #5a5d65 38%, #a8abb3 50%, #eeeff1 62%, #999ca4 75%, #5f626a 88%, #7f828a));
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+  content: '';
 }
 
-.strip--silent {
-  opacity: 0.55;
+.knob__turn i {
+  position: absolute;
+  top: 5%;
+  left: calc(50% - 1.5px);
+  width: 3px;
+  height: 25%;
+  border-radius: 1.5px;
+  background: var(--knob-mark, #f2f3f5);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
 }
 
-.strip--guitar {
-  border-color: rgba(242, 162, 74, 0.55);
-}
-
-.strip__top {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  min-width: 0;
+.knob__label,
+.lever__label,
+.cab__label {
+  font: 600 var(--fs-xs) / 1.3 var(--font-num);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
-.strip__name {
-  font-size: 1rem;
+.knob__label {
+  transition: opacity 0.12s var(--ease);
+}
+
+.knob--small .knob__label {
+  letter-spacing: 0.05em;
+}
+
+/* The value takes the name's place while the knob is touched. */
+.knob__value {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  font-size: var(--fs-sm);
   font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity 0.12s var(--ease);
+  pointer-events: none;
 }
 
-.strip__you {
-  min-width: 0;
-  overflow: hidden;
-  color: var(--accent);
-  font-size: 0.8125rem;
-  text-overflow: ellipsis;
+.knob:hover .knob__label,
+.knob--active .knob__label,
+.knob:focus-visible .knob__label {
+  opacity: 0;
 }
 
-.strip__db {
-  margin-left: auto;
-  color: var(--text-3);
-  font-family: var(--font-num);
-  font-size: 0.8125rem;
-  font-variant-numeric: tabular-nums;
+.knob:hover .knob__value,
+.knob--active .knob__value,
+.knob:focus-visible .knob__value {
+  opacity: 1;
 }
 
-.strip__buttons {
+.knob:focus-visible .knob__body {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.knob--off {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* A lever switch on the panel: up is on. */
+.lever {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--plate-ink);
+}
+
+.lever__slot {
+  position: relative;
+  width: 1.125rem;
+  height: 2.125rem;
+  border-radius: 0.5625rem;
+  background: #08090a;
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.lever__slot i {
+  position: absolute;
+  top: 0.875rem;
+  left: 0.25rem;
+  width: 0.625rem;
+  height: 1.125rem;
+  border-radius: 0.3125rem;
+  background: linear-gradient(90deg, #7d8088, #f3f4f6 45%, #9da0a8);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  transition: top 0.12s var(--ease);
+}
+
+.lever--on .lever__slot i {
+  top: 0.125rem;
+}
+
+.lever:not(.lever--on) .lever__label {
+  opacity: 0.55;
+}
+
+/* ---------- the cabinet ---------- */
+
+.cab {
   display: flex;
-  gap: 0.375rem;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.625rem;
+  border: 1px solid #000;
+  border-radius: 10px;
+  background:
+    radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1.3px) 0 0 / 4px 4px,
+    radial-gradient(rgba(0, 0, 0, 0.35) 1px, transparent 1.3px) 2px 2px / 4px 4px,
+    #1b1c1f;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4);
 }
 
-/* Laptops with Windows scaling at 125–150 % leave about 650–760 px of height for the page. */
-@media (max-height: 720px) {
-
-  .amp {
-    gap: 0.75rem;
-    padding: 0.875rem 1.5rem;
-  }
-
-  .amp__main {
-    gap: 1rem;
-  }
-
-  .amp__knobs {
-    padding-top: 0.75rem;
-  }
-
-  .preset {
-    padding: 0.625rem 0.875rem;
-  }
-
-  .effect {
-    gap: 0.5rem;
-  }
-
-  .strip {
-    gap: 0.25rem;
-    padding: 0.375rem 0.625rem;
-  }
+/* The cloth, with the speaker behind it. */
+.cab__grille {
+  flex: 1;
+  min-height: clamp(6.5rem, 20cqh, 13rem);
+  border-radius: var(--r-lg);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.5) 0 4.25rem, rgba(0, 0, 0, 0.18) 4.3rem 4.75rem, transparent 4.8rem),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.06) 0 2px, transparent 2px 4px),
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.3) 0 2px, transparent 2px 4px),
+    #3a352d;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.07);
 }
 
-@media (max-width: 1100px) {
-
-  .amp__knobs {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .amp__master {
-    padding-left: 0;
-    border-left: 0;
-  }
+.cab__grille--none {
+  opacity: 0.3;
 }
 
-@media (prefers-reduced-motion: reduce) {
-
-  .preset,
-  .preset__name {
-    transition: none;
-  }
-}
-
-/* The hum filter with its mains (Auto / 50 / 60 Hz) beside it. */
-.amp__hum {
+.cab__plate,
+.cab__mains {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  min-width: 0;
 }
 
-.amp__mains {
-  font-size: 0.8125rem;
-  transition: opacity 0.15s var(--ease);
+.cab__label {
+  flex: none;
+  color: var(--text-3);
 }
 
-.amp__mains--off {
-  opacity: 0.45;
+.cab select {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------- a pedal ---------- */
+
+.pedal {
+  --pedal: #3d4046;
+  --plate-ink: #f4f5f6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.625rem, 2.4cqh, 1.375rem);
+  min-width: 0;
+  padding: clamp(0.875rem, 3.4cqh, 2rem) 0.5rem clamp(0.75rem, 2.6cqh, 1.5rem);
+  border: 1px solid rgba(0, 0, 0, 0.85);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0) 28%, rgba(0, 0, 0, 0.2)),
+    var(--pedal);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.28),
+    0 10px 22px rgba(0, 0, 0, 0.4);
+  color: var(--plate-ink);
+  transition: filter 0.15s var(--ease);
+}
+
+.pedal--chorus {
+  --pedal: #2c6a90;
+}
+
+.pedal--delay {
+  --pedal: #577540;
+}
+
+.pedal--reverb {
+  --pedal: #8e9198;
+  --plate-ink: #15161a;
+}
+
+/* Switched off: the paint goes dull. */
+.pedal:not(.pedal--on) {
+  filter: saturate(0.5) brightness(0.8);
+}
+
+.pedal__knobs {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(0.25rem, 0.9cqw, 1rem);
+  min-height: 4.5rem;
+}
+
+.pedal .knob--off {
+  opacity: 0.75;
+}
+
+.pedal__name {
+  font: 600 var(--fs-md) / 1.2 var(--font-num);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.pedal__type {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  gap: 3px;
+}
+
+.pedal__type button {
+  height: 1.375rem;
+  padding: 0 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: var(--r-sm);
+  background: rgba(0, 0, 0, 0.14);
+  color: inherit;
+  font: 600 var(--fs-xs) / 1 var(--font-num);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pedal__type button[aria-checked='true'] {
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+}
+
+.pedal__switch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+  margin-top: auto;
+  padding: 0.25rem 1rem 0;
+  border: 0;
+  background: none;
+}
+
+.pedal__led {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #3d2c12;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+.pedal--on .pedal__led {
+  background: #ffcb6b;
+  box-shadow: 0 0 8px rgba(255, 173, 51, 0.95);
+}
+
+.pedal__foot {
+  width: clamp(2.5rem, 4.4cqw, 3.75rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, #f6f7f8, #a9acb3 45%, #5b5e65 82%);
+  box-shadow:
+    0 0 0 3px rgba(0, 0, 0, 0.38),
+    0 3px 5px rgba(0, 0, 0, 0.5),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.08s var(--ease);
+}
+
+.pedal__switch:active .pedal__foot {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Narrow windows: the presets and the rig's margins give their room to the gear. */
+@media (max-width: 1340px) {
+  .amp {
+    grid-template-columns: 12.5rem minmax(0, 1fr);
+  }
+
+  .amp__rig {
+    padding: 1rem;
+  }
+
+  .head__plate {
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .head__zone--tone {
+    padding: 0 0.5rem;
+  }
 }

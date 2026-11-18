@@ -1,25 +1,18 @@
-// A knob, like on an amp. Drag up or down (Shift: finer), scroll the wheel, double-click for the
-// default. It takes no focus from a click, so the arrows stay the app's (volume, presets); reached
-// with Tab it turns with the arrows, Page keys, Home and End. The value shows while it is touched.
+// A knob, like on an amp: a body with a pointer inside a ring of marks that light up to the value.
+// Drag up or down (Shift: finer), scroll the wheel, double-click for the default. It takes no focus
+// from a click, so the arrows stay the app's (volume, presets); reached with Tab it turns with the
+// arrows, Page keys, Home and End. The value shows in place of the name while it is touched.
 import { useEffect, useRef, useState } from 'react';
 import { dragTo, keyTo, knobAngle, wheelTo } from './knobMath';
 
-const R = 19;
-const C = 24;
+/** The marks around the dial: eleven, from −135° to +135°. */
+const MARKS = Array.from({ length: 11 }, (_, i) => -135 + i * 27);
+const C = 32;
 
-/** A point on the knob's circle, `deg` from straight up. */
-function at(deg: number, r = R): [number, number] {
+/** A point `r` from the centre of the 64 px drawing, `deg` from straight up. */
+function at(deg: number, r: number): [number, number] {
   const rad = (deg * Math.PI) / 180;
   return [C + r * Math.sin(rad), C - r * Math.cos(rad)];
-}
-
-function arc(from: number, to: number): string {
-  if (Math.abs(to - from) < 0.01) return '';
-  const [x0, y0] = at(from);
-  const [x1, y1] = at(to);
-  const large = Math.abs(to - from) > 180 ? 1 : 0;
-  const sweep = to > from ? 1 : 0;
-  return `M ${x0} ${y0} A ${R} ${R} 0 ${large} ${sweep} ${x1} ${y1}`;
 }
 
 export function Knob(props: {
@@ -32,7 +25,7 @@ export function Knob(props: {
   defaultValue: number;
   format: (v: number) => string;
   onChange: (v: number) => void;
-  /** The arc starts in the middle (tone controls around 0). */
+  /** The marks light from the middle (tone controls around 0). */
   bipolar?: boolean;
   size?: 'big' | 'small';
   disabled?: boolean;
@@ -61,8 +54,8 @@ export function Knob(props: {
   }, [min, max, step]);
 
   const angle = knobAngle(value, min, max);
-  const start = bipolar ? knobAngle((min + max) / 2, min, max) : -135;
-  const [px, py] = at(angle, R - 7);
+  const from = bipolar ? Math.min(0, angle) : -135;
+  const to = bipolar ? Math.max(0, angle) : angle;
   const shown = format(value);
 
   return (
@@ -111,12 +104,20 @@ export function Knob(props: {
         if (next !== value) onChange(next);
       }}
     >
-      <svg className="knob__dial" viewBox="0 0 48 48" aria-hidden="true">
-        <path className="knob__track" d={arc(-135, 135)} />
-        <path className="knob__arc" d={arc(Math.min(start, angle), Math.max(start, angle))} />
-        <circle className="knob__cap" cx={C} cy={C} r={R - 5} />
-        <line className="knob__pointer" x1={C} y1={C} x2={px} y2={py} />
-      </svg>
+      <span className="knob__dial">
+        <svg className="knob__marks" viewBox="0 0 64 64" aria-hidden="true">
+          {MARKS.map((deg) => {
+            const [x1, y1] = at(deg, 27.5);
+            const [x2, y2] = at(deg, deg % 135 === 0 ? 31.5 : 30.5);
+            const lit = deg >= from - 0.5 && deg <= to + 0.5;
+            return <line key={deg} className={lit ? 'is-lit' : undefined} x1={x1} y1={y1} x2={x2} y2={y2} />;
+          })}
+        </svg>
+        <span className="knob__body" />
+        <span className="knob__turn" style={{ transform: `rotate(${angle}deg)` }}>
+          <i />
+        </span>
+      </span>
       <span className="knob__label">{label}</span>
       <span className="knob__value num">{shown}</span>
     </div>

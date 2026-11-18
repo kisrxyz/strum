@@ -1,5 +1,6 @@
 // What the keys and buttons of «Песни» → «Записи» do.
-import { getLanguage, L } from '../i18n';
+import { L } from '../i18n';
+import { locale } from '../i18n/lang';
 import { api } from '../song/api';
 import { useRuntime } from '../state/runtime';
 import { useSong } from '../state/song';
@@ -18,9 +19,8 @@ let pendingDelete: { id: string; until: number } | null = null;
 export function takeWhen(createdAt: string): string {
   const date = new Date(createdAt);
   if (Number.isNaN(date.getTime())) return '';
-  const locale = getLanguage() === 'ru' ? 'ru-RU' : 'en-US';
-  const day = date.toLocaleDateString(locale, { day: 'numeric', month: 'long' });
-  const time = date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+  const day = date.toLocaleDateString(locale(), { day: 'numeric', month: 'long' });
+  const time = date.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
   return `${day}, ${time}`;
 }
 

@@ -4,8 +4,14 @@ import { getLanguage } from '../i18n';
 import { useLang } from '../i18n/useLang';
 import { useEngineFrame } from './useEngineFrame';
 
-/** Chromatic tuner. Updates the DOM directly every frame (no React re-renders). */
-export function Tuner({ size }: { size: 'compact' | 'big' }) {
+/** The open strings of a guitar in standard tuning, thick to thin (strings 6…1). */
+const STRINGS = ['E', 'A', 'D', 'G', 'B', 'E'];
+
+/**
+ * Chromatic tuner: the note, a needle over a scale of ±50 cents, and the six strings with the one
+ * nearest to the note lit. Updates the DOM directly every frame (no React re-renders).
+ */
+export function Tuner() {
   const root = useRef<HTMLDivElement>(null);
   const noteEl = useRef<HTMLSpanElement>(null);
   const accEl = useRef<HTMLSpanElement>(null);
@@ -29,7 +35,8 @@ export function Tuner({ size }: { size: 'compact' | 'big' }) {
         last.key = '';
         last.string = '';
         el.dataset.state = 'idle';
-        if (noteEl.current) noteEl.current.textContent = '—';
+        el.dataset.string = '';
+        if (noteEl.current) noteEl.current.textContent = '–';
         if (accEl.current) accEl.current.textContent = '';
         if (octaveEl.current) octaveEl.current.textContent = '';
         if (solfegeEl.current) solfegeEl.current.textContent = t.input.playNote;
@@ -46,7 +53,7 @@ export function Tuner({ size }: { size: 'compact' | 'big' }) {
       if (noteEl.current) noteEl.current.textContent = s.note.name.charAt(0);
       if (accEl.current) accEl.current.textContent = s.note.name.slice(1);
       if (octaveEl.current) octaveEl.current.textContent = String(s.note.octave);
-      // Do, re, mi under the letter is a Russian habit: English shows the letter only.
+      // Do, re, mi under the letter is a Russian habit: other languages show the letter only.
       if (solfegeEl.current) solfegeEl.current.textContent = getLanguage() === 'ru' ? s.note.solfege : '';
     }
     const cents = Math.round(s.note.cents);
@@ -54,38 +61,43 @@ export function Tuner({ size }: { size: 'compact' | 'big' }) {
       last.cents = cents;
       el.dataset.state = tuneState(s.note.cents);
       el.style.setProperty('--cents', String(Math.max(-50, Math.min(50, s.note.cents))));
-      if (centsEl.current) centsEl.current.textContent = cents > 0 ? `+${cents}` : String(cents);
+      if (centsEl.current) centsEl.current.textContent = cents > 0 ? `+${cents}` : cents < 0 ? `−${-cents}` : '0';
     }
-    const stringText = s.string && Math.abs(s.string.cents) <= 50 ? t.input.stringName(s.string.stringNumber) : '';
+    const near = s.string && Math.abs(s.string.cents) <= 50 ? s.string.stringNumber : 0;
+    const stringText = near ? t.input.stringName(near) : '';
     if (stringText !== last.string) {
       last.string = stringText;
+      el.dataset.string = near ? String(near) : '';
       if (stringEl.current) stringEl.current.textContent = stringText;
     }
   });
 
   return (
-    <div ref={root} className={`tuner tuner--${size}`} data-state="idle" aria-label={t.input.tuner}>
+    <div ref={root} className="tuner" data-state="idle" aria-label={t.input.tuner}>
       <div className="tuner__note">
-        <span ref={noteEl} className="tuner__name">—</span>
+        <span ref={noteEl} className="tuner__name">–</span>
         <span ref={accEl} className="tuner__acc" />
         <span ref={octaveEl} className="tuner__octave" />
       </div>
-      <div className="tuner__side">
-        <div className="tuner__scale" aria-hidden="true">
-          <span className="tuner__zone" />
-          <span className="tuner__ticks" />
-          <span className="tuner__center" />
-          <span className="tuner__needle" />
-          <span className="tuner__flat">♭</span>
-          <span className="tuner__sharp">♯</span>
-        </div>
-        <div className="tuner__meta">
-          <span ref={solfegeEl} className="tuner__solfege">
-            {t.input.playNote}
-          </span>
-          <span ref={centsEl} className="tuner__cents num" data-unit={t.input.centsUnit} />
-          <span ref={stringEl} className="tuner__string" />
-        </div>
+      <div className="tuner__scale" aria-hidden="true">
+        <span className="tuner__zone" />
+        <span className="tuner__ticks" />
+        <span className="tuner__center" />
+        <span className="tuner__needle" />
+        <span className="tuner__flat">♭</span>
+        <span className="tuner__sharp">♯</span>
+      </div>
+      <div className="tuner__meta">
+        <span ref={solfegeEl} className="tuner__solfege">
+          {t.input.playNote}
+        </span>
+        <span ref={centsEl} className="tuner__cents num" data-unit={t.input.centsUnit} />
+        <span ref={stringEl} className="tuner__string" />
+      </div>
+      <div className="tuner__strings" aria-hidden="true">
+        {STRINGS.map((name, i) => (
+          <span key={i}>{name}</span>
+        ))}
       </div>
     </div>
   );

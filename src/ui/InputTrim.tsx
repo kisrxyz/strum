@@ -55,7 +55,7 @@ export function InputTrim() {
 
   if (listening) {
     return (
-      <div className="trim" role="status">
+      <div className="trim trim--on" role="status">
         <p className="trim__ask">{t.input.trimAsk}</p>
         <span className="trim__track" aria-hidden="true">
           <span ref={fill} className="trim__fill" />
@@ -73,20 +73,21 @@ export function InputTrim() {
   }
 
   return (
-    <div className="trim">
-      <p className="trim__line">
-        <span>
-          {t.input.trimNow}: <b className="num">{trimDb === 0 ? t.input.trimNone : fmtDb(trimDb)}</b>
-        </span>
+    <div className="row trim">
+      <span className="row__label">
+        {t.input.trimNow}
+        <span className="row__hint num">{trimDb === 0 ? t.input.trimNone : fmtDb(trimDb)}</span>
+      </span>
+      <span className="row__control">
         {trimDb !== 0 && (
           <button type="button" className="link" onClick={() => setTrim(0)}>
             {t.common.reset}
           </button>
         )}
-      </p>
-      <button type="button" className="btn trim__go" title={withKey(t.input.trim, 'G')} onClick={() => patch({ trimListening: true })}>
-        {t.input.trim}
-      </button>
+        <button type="button" className="btn" title={withKey(t.input.trim, 'G')} onClick={() => patch({ trimListening: true })}>
+          {t.input.trim}
+        </button>
+      </span>
     </div>
   );
 }

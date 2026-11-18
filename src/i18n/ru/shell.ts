@@ -1,9 +1,12 @@
 import type { Dict } from '../dict';
 
 export const shell: Dict['shell'] = {
-  screens: { song: 'Песня', library: 'Песни', amp: 'Комбик', input: 'Вход' },
+  screens: { song: 'Плеер', library: 'Песни', amp: 'Комбик', input: 'Настройки' },
   screensLabel: 'Экраны',
-  presets: 'Пресеты',
+  presetPrev: 'Предыдущий пресет',
+  presetNext: 'Следующий пресет',
+  openAmp: 'Открыть комбик',
+  soundOff: 'Звук выключен',
   setlistPlace: (place: number, total: number) => `Сет-лист ${place} из ${total}`,
   radio: 'Радио',
   record: 'Запись',
@@ -27,7 +30,6 @@ export const shell: Dict['shell'] = {
     },
   },
 
-  bigTuner: 'Большой тюнер',
   bigTunerClose: 'Закрыть: T или Esc',
   dropZone: 'Отпусти, чтобы добавить: песню (mp3, m4a, wav, flac), таб Guitar Pro, модель усилителя (.nam) или кабинет (.wav)',
 

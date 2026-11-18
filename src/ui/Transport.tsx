@@ -1,43 +1,30 @@
-import { useRef } from 'react';
+import { Guitar, Metronome, Minus, Music, Pause, Play, Plus, Repeat, SkipBack, SlidersVertical } from 'lucide-react';
+import { useRef, type CSSProperties, type ReactNode } from 'react';
 import { withKey } from '../i18n';
 import { useLang } from '../i18n/useLang';
 import { barAt } from '../music/bars';
-import { TUNINGS } from '../music/tunings';
 import { songActions } from '../song/actions';
 import { fmtPitch, fmtTime } from '../song/format';
 import { funActions } from '../song/funActions';
 import { songBars } from '../song/grid';
 import { songPlayer } from '../song/player';
 import { MIN_LOOP } from '../song/schedule';
-import type { Analysis, Song } from '../song/types';
+import { isTabSong, type Analysis, type Song } from '../song/types';
 import { useRuntime } from '../state/runtime';
-import { useSettings } from '../state/settings';
+import {
+  GUITAR_VOLUME_MAX_DB,
+  GUITAR_VOLUME_MIN_DB,
+  SONG_VOLUME_MAX_DB,
+  SONG_VOLUME_MIN_DB,
+  useSettings,
+} from '../state/settings';
 import { useSong } from '../state/song';
-import { separationText, Volumes } from './Mixer';
-import { useCapoHint } from './useCapoHint';
+import { fmtDb } from './controls';
+import { IconNeck } from './icons';
+import { separationText } from './Mixer';
 import { useEngineFrame } from './useEngineFrame';
 
-const PLAY = (
-  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M7 4.5v15l12-7.5z" />
-  </svg>
-);
-const PAUSE = (
-  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <rect x="6" y="4.5" width="4" height="15" rx="1" />
-    <rect x="14" y="4.5" width="4" height="15" rx="1" />
-  </svg>
-);
-const SETTINGS = (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-    <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12" />
-    <circle cx="16" cy="6" r="2" />
-    <circle cx="10" cy="12" r="2" />
-    <circle cx="18" cy="18" r="2" />
-  </svg>
-);
-
-/** «0:42 · bar 12», written every frame without re-rendering React. */
+/** The time and the bar in a sunk field, written every frame without re-rendering React. */
 function Clock({ song }: { song: Song }) {
   const t = useLang();
   const time = useRef<HTMLSpanElement>(null);
@@ -56,18 +43,18 @@ function Clock({ song }: { song: Song }) {
     if (bar.current) bar.current.textContent = b;
   });
   return (
-    <div className="transport__clock">
-      <span ref={time} className="transport__time num">
+    <div className="readout transport__clock">
+      <span ref={time} className="transport__time">
         0:00
       </span>
-      <span className="transport__total num">/ {fmtTime(song.duration)}</span>
-      <span ref={bar} className="transport__bar num" />
+      <span className="transport__total">/ {fmtTime(song.duration)}</span>
+      <span ref={bar} className="transport__bar" />
     </div>
   );
 }
 
-/** «Повтори за мной»: whose pass of the loop it is, updated every frame without re-rendering React. */
-function RepeatButton() {
+/** Repeat after me: whose pass of the loop it is, updated every frame without re-rendering React. */
+function RepeatChip() {
   const t = useLang();
   const text = useRef<HTMLSpanElement>(null);
   const last = useRef('');
@@ -78,154 +65,213 @@ function RepeatButton() {
     text.current.textContent = words;
   });
   return (
-    <button
-      type="button"
-      className="btn btn--on transport__repeat"
-      title={withKey(t.songUi.repeat, 'Shift+R')}
-      onClick={() => funActions.toggleRepeat()}
-    >
+    <button type="button" className="tag tag--on" title={withKey(t.songUi.repeat, 'Shift+R')} onClick={() => funActions.toggleRepeat()}>
       <span ref={text}>{t.songUi.repeat}</span>
     </button>
   );
 }
 
-/** A readout you can click: «Скорость 100 %». `on` when it is not at its usual value. */
-function Value({ label, value, on, title, onClick }: { label: string; value: string; on: boolean; title: string; onClick: () => void }) {
+/** A value with − and + around it; a click on the value puts it back. */
+function Step(props: { label: string; value: string; on: boolean; down: string; up: string; reset: string; onStep: (dir: 1 | -1) => void; onReset: () => void }) {
   return (
-    <button type="button" className={`tvalue${on ? ' tvalue--on' : ''}`} title={title} onClick={onClick}>
-      <span className="tvalue__label">{label}</span>
-      <b className="num">{value}</b>
-    </button>
+    <div className="tfield">
+      <span className="tfield__label">{props.label}</span>
+      <span className={`stepper${props.on ? ' is-on' : ''}`}>
+        <button type="button" aria-label={props.down} title={props.down} onClick={() => props.onStep(-1)}>
+          <Minus size={14} />
+        </button>
+        <button type="button" className="stepper__value" title={props.reset} onClick={props.onReset}>
+          {props.value}
+        </button>
+        <button type="button" aria-label={props.up} title={props.up} onClick={() => props.onStep(1)}>
+          <Plus size={14} />
+        </button>
+      </span>
+    </div>
+  );
+}
+
+function Volume(props: { icon: ReactNode; name: string; keys: string; db: number; min: number; max: number; onChange: (db: number) => void }) {
+  const pct = ((props.db - props.min) / (props.max - props.min)) * 100;
+  return (
+    <label className="vol" title={withKey(props.name, props.keys)}>
+      {props.icon}
+      <input
+        type="range"
+        min={props.min}
+        max={props.max}
+        step={1}
+        value={props.db}
+        aria-label={props.name}
+        style={{ '--pct': `${pct}%` } as CSSProperties}
+        onChange={(e) => props.onChange(Number(e.target.value))}
+      />
+      <span className="vol__db num">{fmtDb(props.db)}</span>
+    </label>
+  );
+}
+
+/** Your guitar and the song: the two volumes one turns while playing. */
+function Volumes() {
+  const m = useLang().songUi.mixer;
+  const guitarDb = useSettings((s) => s.guitarDb);
+  const songDb = useSettings((s) => s.songVolumeDb);
+  const setGuitarDb = useSettings((s) => s.setGuitarDb);
+  const setSongDb = useSettings((s) => s.setSongVolumeDb);
+  return (
+    <div className="vols">
+      <Volume icon={<Guitar size={16} />} name={m.guitarVolume} keys="Alt+↑ ↓" db={guitarDb} min={GUITAR_VOLUME_MIN_DB} max={GUITAR_VOLUME_MAX_DB} onChange={setGuitarDb} />
+      <Volume icon={<Music size={16} />} name={m.songVolume} keys="Shift+↑ ↓" db={songDb} min={SONG_VOLUME_MIN_DB} max={SONG_VOLUME_MAX_DB} onChange={setSongDb} />
+    </div>
   );
 }
 
 /**
- * The song's one bottom row: play, where it is, speed, pitch, the loop, small tags for what is
- * switched on, the volumes, and the three panels that open in the neck's place (Гриф, Дорожки,
- * Настройки). Every button has its key in its tooltip; the keys are listed in «Настройки».
+ * The player's bottom row: to the start, play, the time and the bar; the loop, the click and the
+ * count-in as lit buttons; speed and pitch with their steps; the original guitar; the two volumes;
+ * the neck and the mixer. Each button's key is in its tooltip. What is rarely touched lives in
+ * the options panel, and shows here only while it is on.
  */
-export function Transport({ song, analysis }: { song: Song; analysis: Analysis | null }) {
+export function Transport({ song, analysis: _analysis }: { song: Song; analysis: Analysis | null }) {
   const t = useLang();
   const u = t.songUi;
   const playing = useSong((s) => s.playing);
   const state = useSong((s) => s.state);
   const mixerOpen = useSong((s) => s.mixerOpen);
-  const settingsOpen = useRuntime((s) => s.songSettings);
   const repeat = useRuntime((s) => s.repeat);
   const trainer = useRuntime((s) => s.speedTrainer);
   const neckShown = useSettings((s) => s.neckShown[song.player.view]);
-  const capoHint = useCapoHint(song, analysis);
   const p = song.player;
   const loopSet = p.loop.end - p.loop.start >= MIN_LOOP;
   const loopOn = loopSet && p.loop.on;
   const stems = separationText(song);
-
-  const tags: { text: string; title: string; onClick: () => void }[] = [];
-  if (p.mode === 'ear')
-    tags.push({ text: u.transport.byEar(u.hintsShort[p.reveal]), title: withKey(u.transport.nextHint, 'J'), onClick: () => songActions.nextHint() });
-  if (p.muted.includes('guitar') === false && p.solo !== 'guitar')
-    tags.push({ text: u.originalGuitar, title: withKey(u.originalGuitar, 'G'), onClick: () => songActions.toggleGuitar() });
-  if (p.solo === 'guitar') tags.push({ text: u.guitarOnly, title: withKey(u.guitarOnly, 'S'), onClick: () => songActions.soloGuitar() });
-  if (p.capo) tags.push({ text: u.transport.capoOn(p.capo), title: withKey(u.capo, '[ ]'), onClick: () => songActions.stepCapo(1) });
-  else if (capoHint)
-    tags.push({ text: u.transport.capoEasier(capoHint.capo), title: withKey(u.capo, ']'), onClick: () => songActions.stepCapo(1) });
-  if (p.tuning !== 'standard') tags.push({ text: TUNINGS[p.tuning].name, title: withKey(u.tuning, 'U'), onClick: () => songActions.nextTuning() });
-  if (p.simpleChords) tags.push({ text: u.simpleChords, title: withKey(u.simpleChords, 'P'), onClick: () => songActions.toggleSimple() });
-  if (p.click) tags.push({ text: u.click, title: withKey(u.click, 'C'), onClick: () => songActions.toggleClick() });
-  if (p.countIn) tags.push({ text: u.countIn, title: withKey(u.countIn, 'O'), onClick: () => songActions.toggleCountIn() });
+  const guitarOn = !p.muted.includes('guitar');
+  const tabSong = isTabSong(song);
+  const loopText = loopSet ? `${fmtTime(p.loop.start)}–${fmtTime(p.loop.end)}` : p.loop.start > 0 ? u.transport.loopFrom(fmtTime(p.loop.start)) : '';
 
   return (
     <footer className="transport" aria-label={u.transport.label}>
-      <button
-        type="button"
-        className="transport__play"
-        disabled={state !== 'ready'}
-        title={withKey(playing ? u.transport.pause : u.transport.play, u.spaceKey)}
-        aria-label={playing ? u.transport.pause : u.transport.play}
-        onClick={() => songActions.togglePlay()}
-      >
-        {playing ? PAUSE : PLAY}
-      </button>
-      <Clock song={song} />
-      <span className="transport__sep" aria-hidden="true" />
-      <Value
-        label={u.speed}
-        value={t.common.units.pct(Math.round(p.speed * 100))}
-        on={p.speed !== 1}
-        title={`${withKey(u.transport.speedTip, '− =')}. ${u.transport.clickToReset}`}
-        onClick={() => songActions.setSpeed(1)}
-      />
-      <Value
-        label={u.pitch}
-        value={fmtPitch(p.semitones, p.cents)}
-        on={p.semitones !== 0 || p.cents !== 0}
-        title={`${withKey(u.transport.pitchTip, ', .')} · ${withKey(u.transport.centsTip, 'Shift+, .')}. ${u.transport.clickToReset}`}
-        onClick={() => songActions.resetPitch()}
-      />
-      <Value
-        label={u.loop}
-        value={
-          loopSet
-            ? p.loop.on
-              ? `${fmtTime(p.loop.start)}–${fmtTime(p.loop.end)}`
-              : t.common.off
-            : p.loop.start > 0
-              ? u.transport.loopFrom(fmtTime(p.loop.start))
-              : t.common.none
-        }
-        on={loopOn}
-        title={`${withKey(u.transport.loopEnds, 'A B')} · ${withKey(u.transport.loopOnOff, 'R')} · ${withKey(u.loopSection, 'Q')}`}
-        onClick={() => songActions.toggleLoop()}
-      />
-      {loopOn &&
-        (repeat ? (
-          <RepeatButton />
-        ) : (
-          <button type="button" className="btn btn--quiet" title={withKey(u.repeat, 'Shift+R')} onClick={() => funActions.toggleRepeat()}>
-            {u.repeat}
-          </button>
-        ))}
-      {(loopOn || trainer) && (
+      <div className="transport__group">
+        <button type="button" className="iconbtn iconbtn--lg" aria-label={u.transport.toStart} title={withKey(u.transport.toStart, 'Home')} onClick={() => songActions.home()}>
+          <SkipBack />
+        </button>
         <button
           type="button"
-          className={`btn ${trainer ? 'btn--on' : 'btn--quiet'}`}
-          title={withKey(u.transport.trainerTip, 'Shift+=')}
-          onClick={() => funActions.toggleSpeedTrainer()}
+          className={`transport__play${playing ? ' is-on' : ''}`}
+          disabled={state !== 'ready'}
+          title={withKey(playing ? u.transport.pause : u.transport.play, u.spaceKey)}
+          aria-label={playing ? u.transport.pause : u.transport.play}
+          onClick={() => songActions.togglePlay()}
         >
-          {u.trainer}
+          {playing ? <Pause size={20} fill="currentColor" strokeWidth={0} /> : <Play size={20} fill="currentColor" strokeWidth={0} />}
         </button>
-      )}
-      <div className="transport__tags">
-        {tags.map((tag) => (
-          <button key={tag.text} type="button" className="tag tag--button" title={tag.title} onClick={tag.onClick}>
-            {tag.text}
-          </button>
-        ))}
+        <Clock song={song} />
       </div>
-      <Volumes />
+
       <span className="transport__sep" aria-hidden="true" />
+
+      <div className="transport__group">
+        <button
+          type="button"
+          className="btn transport__loop"
+          aria-pressed={loopOn}
+          title={`${withKey(u.transport.loopOnOff, 'R')} · ${withKey(u.transport.loopEnds, 'A B')} · ${withKey(u.loopSection, 'Q')}`}
+          onClick={() => songActions.toggleLoop()}
+        >
+          <Repeat size={16} />
+          {loopText ? <span className="num">{loopText}</span> : u.loop}
+        </button>
+        <button type="button" className="iconbtn iconbtn--lg" aria-pressed={p.click} aria-label={u.click} title={withKey(u.click, 'C')} onClick={() => songActions.toggleClick()}>
+          <Metronome />
+        </button>
+        <button
+          type="button"
+          className="iconbtn iconbtn--lg transport__count num"
+          aria-pressed={p.countIn}
+          aria-label={u.countIn}
+          title={withKey(u.countIn, 'O')}
+          onClick={() => songActions.toggleCountIn()}
+        >
+          1234
+        </button>
+      </div>
+
+      <span className="transport__sep" aria-hidden="true" />
+
+      <div className="transport__group">
+        <Step
+          label={u.speed}
+          value={t.common.units.pct(Math.round(p.speed * 100))}
+          on={p.speed !== 1}
+          down={withKey(u.transport.slower, '−')}
+          up={withKey(u.transport.faster, '=')}
+          reset={u.transport.clickToReset}
+          onStep={(dir) => songActions.stepSpeed(dir)}
+          onReset={() => songActions.setSpeed(1)}
+        />
+        <Step
+          label={u.pitch}
+          value={fmtPitch(p.semitones, p.cents)}
+          on={p.semitones !== 0 || p.cents !== 0}
+          down={`${withKey(u.transport.pitchDown, ',')} · ${withKey(u.transport.centsTip, 'Shift+,')}`}
+          up={`${withKey(u.transport.pitchUp, '.')} · ${withKey(u.transport.centsTip, 'Shift+.')}`}
+          reset={u.transport.clickToReset}
+          onStep={(dir) => songActions.stepPitch(dir, false)}
+          onReset={() => songActions.resetPitch()}
+        />
+      </div>
+
+      <div className="transport__modes">
+        {loopOn && repeat && <RepeatChip />}
+        {trainer && (
+          <button type="button" className="tag tag--on" title={withKey(u.transport.trainerTip, 'Shift+=')} onClick={() => funActions.toggleSpeedTrainer()}>
+            {u.trainer}
+          </button>
+        )}
+        {p.mode === 'ear' && (
+          <button type="button" className="tag tag--on" title={withKey(u.transport.nextHint, 'J')} onClick={() => songActions.nextHint()}>
+            {u.transport.byEar(u.hintsShort[p.reveal])}
+          </button>
+        )}
+      </div>
+
+      <span className="transport__gap" />
+
       <button
         type="button"
-        className="btn"
-        aria-pressed={neckShown && !mixerOpen && !settingsOpen}
-        title={`${withKey(u.fretboard, 'F')} · ${withKey(u.transport.neckShows, 'Shift+F')}`}
-        onClick={() => songActions.toggleNeck()}
+        className="btn transport__guitar"
+        aria-pressed={p.solo === 'guitar' || (guitarOn && !p.solo)}
+        title={withKey(tabSong ? u.mixer.yourPart : u.originalGuitarTip, 'G')}
+        onClick={() => songActions.toggleGuitar()}
       >
-        {u.fretboard}
+        {tabSong ? u.mixer.yourPart : u.originalGuitar}
       </button>
-      <button
-        type="button"
-        className={`btn${stems?.tone === 'error' ? ' btn--cold' : ''}`}
-        aria-pressed={mixerOpen}
-        title={stems?.text ?? u.transport.stemsTip}
-        onClick={() => songActions.toggleMixer()}
-      >
-        {u.stems}
-      </button>
-      <button type="button" className="btn" aria-pressed={settingsOpen} title={u.transport.settingsTip} onClick={() => songActions.toggleSettings()}>
-        {SETTINGS}
-        {u.settings}
-      </button>
+      <Volumes />
+
+      <span className="transport__sep" aria-hidden="true" />
+
+      <div className="transport__group">
+        <button
+          type="button"
+          className="iconbtn iconbtn--lg"
+          aria-pressed={neckShown && !mixerOpen}
+          aria-label={u.fretboard}
+          title={`${withKey(u.fretboard, 'F')} · ${withKey(u.transport.neckShows, 'Shift+F')}`}
+          onClick={() => songActions.toggleNeck()}
+        >
+          <IconNeck />
+        </button>
+        <button
+          type="button"
+          className={`iconbtn iconbtn--lg${stems?.tone === 'error' ? ' is-cold' : ''}`}
+          aria-pressed={mixerOpen}
+          aria-label={u.stems}
+          title={stems?.text ?? u.transport.stemsTip}
+          onClick={() => songActions.toggleMixer()}
+        >
+          <SlidersVertical />
+        </button>
+      </div>
     </footer>
   );
 }

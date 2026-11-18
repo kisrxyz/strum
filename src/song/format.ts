@@ -1,5 +1,6 @@
 // Text for times, speed and pitch on the song screen.
-import { L, getLanguage } from '../i18n';
+import { L } from '../i18n';
+import { decimal } from '../i18n/lang';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -19,7 +20,7 @@ export function fmtSpeed(speed: number): string {
 export function fmtPitch(semitones: number, cents: number): string {
   const total = Math.round((semitones + cents / 100) * 100) / 100;
   if (total === 0) return '0';
-  const text = getLanguage() === 'ru' ? String(Math.abs(total)).replace('.', ',') : String(Math.abs(total));
+  const text = decimal(String(Math.abs(total)));
   return (total > 0 ? '+' : '−') + text;
 }
 

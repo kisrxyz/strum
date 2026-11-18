@@ -156,30 +156,80 @@ def installed_packages() -> set[tuple[str, str]]:
     }
 
 
-class _IoCounters(ctypes.Structure):
+class _IfRow(ctypes.Structure):
+    """MIB_IFROW (iphlpapi): one network interface with its 32-bit byte counters."""
+
     _fields_ = [
-        (name, ctypes.c_ulonglong)
-        for name in (
-            "ReadOperationCount",
-            "WriteOperationCount",
-            "OtherOperationCount",
-            "ReadTransferCount",
-            "WriteTransferCount",
-            "OtherTransferCount",
-        )
+        ("wszName", ctypes.c_wchar * 256),
+        ("dwIndex", ctypes.c_ulong),
+        ("dwType", ctypes.c_ulong),
+        ("dwMtu", ctypes.c_ulong),
+        ("dwSpeed", ctypes.c_ulong),
+        ("dwPhysAddrLen", ctypes.c_ulong),
+        ("bPhysAddr", ctypes.c_ubyte * 8),
+        ("dwAdminStatus", ctypes.c_ulong),
+        ("dwOperStatus", ctypes.c_ulong),
+        ("dwLastChange", ctypes.c_ulong),
+        ("dwInOctets", ctypes.c_ulong),
+        ("dwInUcastPkts", ctypes.c_ulong),
+        ("dwInNUcastPkts", ctypes.c_ulong),
+        ("dwInDiscards", ctypes.c_ulong),
+        ("dwInErrors", ctypes.c_ulong),
+        ("dwInUnknownProtos", ctypes.c_ulong),
+        ("dwOutOctets", ctypes.c_ulong),
+        ("dwOutUcastPkts", ctypes.c_ulong),
+        ("dwOutNUcastPkts", ctypes.c_ulong),
+        ("dwOutDiscards", ctypes.c_ulong),
+        ("dwOutErrors", ctypes.c_ulong),
+        ("dwOutQLen", ctypes.c_ulong),
+        ("dwDescrLen", ctypes.c_ulong),
+        ("bDescr", ctypes.c_ubyte * 256),
     ]
 
 
-def _bytes_read(process: subprocess.Popen) -> int | None:
-    """What uv has read so far (on Windows, the network included): its download progress."""
+_LOOPBACK = 24  # IF_TYPE_SOFTWARE_LOOPBACK
+
+
+def _interfaces_received() -> dict[int, int] | None:
+    """Bytes each network interface has received (Windows; 32-bit, they wrap), loopback left out."""
     if sys.platform != "win32":
         return None
-    counters = _IoCounters()
-    handle = getattr(process, "_handle", None)
-    if handle is None:
+    try:
+        get_if_table = ctypes.windll.iphlpapi.GetIfTable
+        size = ctypes.c_ulong(0)
+        get_if_table(None, ctypes.byref(size), False)
+        buffer = ctypes.create_string_buffer(size.value)
+        if get_if_table(buffer, ctypes.byref(size), False) != 0:
+            return None
+        count = ctypes.c_ulong.from_buffer(buffer).value
+        rows = (_IfRow * count).from_buffer(buffer, ctypes.sizeof(ctypes.c_ulong))
+        return {row.dwIndex: row.dwInOctets for row in rows if row.dwType != _LOOPBACK}
+    except (OSError, AttributeError, ValueError):
         return None
-    ok = ctypes.windll.kernel32.GetProcessIoCounters(ctypes.c_void_p(int(handle)), ctypes.byref(counters))
-    return int(counters.ReadTransferCount + counters.OtherTransferCount) if ok else None
+
+
+class Received:
+    """How much the computer has downloaded since this was made: uv's progress.
+    uv's own I/O counters do not see its sockets (measured 2026-11-18: 13 MB of 2.9 GB),
+    so the interfaces' counters are read instead. Each interface's growth is added up through
+    its 32-bit wraps; the biggest one counts (a VPN or a filter driver shows the same bytes
+    twice). Other downloads at the same time make it run ahead: the caller caps it."""
+
+    def __init__(self, read: Callable[[], dict[int, int] | None] = _interfaces_received) -> None:
+        self._read = read
+        self._last: dict[int, int] = read() or {}
+        self._grown: dict[int, int] = {}
+
+    def bytes(self) -> int:
+        now = self._read()
+        if now is None:
+            return 0
+        for index, value in now.items():
+            last = self._last.get(index)
+            if last is not None:
+                self._grown[index] = self._grown.get(index, 0) + (value - last) % 2**32
+            self._last[index] = value
+        return max(self._grown.values(), default=0)
 
 
 @dataclass
@@ -314,11 +364,11 @@ class Components:
         with log.open("a", encoding="utf-8") as out:
             out.write(f"\n{time.strftime('%Y-%m-%d %H:%M:%S')} {' '.join(command)}\n")
             out.flush()
+            received = Received()
             process = subprocess.Popen(command, stdout=out, stderr=out, stdin=subprocess.DEVNULL, **_no_window())
             while process.poll() is None:
-                read = _bytes_read(process)
-                if read is not None and part.total:
-                    part.done = min(read, int(part.total * 0.99))
+                if part.total:
+                    part.done = min(received.bytes(), int(part.total * 0.99))
                 time.sleep(0.5)
         if process.returncode != 0:
             raise RuntimeError(f"uv exit {process.returncode}, see {log}")

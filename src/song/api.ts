@@ -1,5 +1,6 @@
 // Client of the song service (service/), reached through Vite's /api proxy.
-import { getLanguage, L } from '../i18n';
+import { L } from '../i18n';
+import { fileLang } from '../i18n/lang';
 import { isServiceMessage, messageText } from '../i18n/messages';
 import { fileNameFromDisposition } from './format';
 import type { Analysis, ChordSegment, ExportBody, GuitarNote, Health, Lyrics, ModelId, PlayerSettings, Song, SongList, Stem, TabInfo, Take, Transcript } from './types';
@@ -188,5 +189,5 @@ export const api = {
   /** `version` changes when the mp3 is built again (the nudge), so the player does not keep the old one. */
   takeUrl: (id: string, version: number) => `${BASE}/takes/${id}/take.mp3?v=${version}`,
   /** The language names the downloaded file. */
-  takeDownloadUrl: (id: string) => `${BASE}/takes/${id}/take.mp3?download=1&lang=${getLanguage()}`,
+  takeDownloadUrl: (id: string) => `${BASE}/takes/${id}/take.mp3?download=1&lang=${fileLang()}`,
 };

@@ -6,11 +6,11 @@
     <title>Strum</title>
     <style>
       :root {
-        --bg: #16110d;
-        --text: #eee4d8;
-        --muted: #a39484;
-        --accent: #f2a24a;
-        --cold: #8fb3c9;
+        --bg: #141517;
+        --text: #e9eaec;
+        --muted: #848891;
+        --accent: #ffad33;
+        --cold: #6fb2d9;
       }
       html,
       body {
@@ -18,7 +18,7 @@
         margin: 0;
         background: var(--bg);
         color: var(--text);
-        font: 16px/1.5 'Segoe UI', system-ui, sans-serif;
+        font: 15px/1.5 'Segoe UI Variable Text', 'Segoe UI', 'Yu Gothic UI', 'Microsoft YaHei UI', system-ui, sans-serif;
         cursor: default;
         user-select: none;
       }
@@ -39,8 +39,8 @@
       }
       h1 {
         margin: 0;
-        font-weight: 500;
-        font-size: 28px;
+        font-weight: 600;
+        font-size: 26px;
       }
       #lead {
         margin: 0;
@@ -62,7 +62,7 @@
         width: 220px;
         height: 3px;
         border-radius: 2px;
-        background: #2a221b;
+        background: #212327;
         overflow: hidden;
       }
       .bar::after {
@@ -108,7 +108,8 @@
     </main>
     <script>
       // Words of the start screen. The app's own words live in src/i18n; this page shows before
-      // the app is there. The language is the one saved in the app's settings (main.rs).
+      // the app is there. The language is the one saved in the app's settings (main.rs); on a first
+      // start there is none yet, and the system's language is taken when Strum speaks it.
       const WORDS = {
         en: {
           starting: 'Starting…',
@@ -128,8 +129,63 @@
           other: 'Strum не запустился. Закрой его и открой ещё раз.',
           logs: 'Журналы',
         },
+        es: {
+          starting: 'Iniciando…',
+          setup: 'Preparando Strum para su primer inicio. Tarda uno o dos minutos y necesita internet una vez.',
+          files: 'Faltan archivos del programa. Reinstala Strum.',
+          download: 'No se pudo descargar lo que Strum necesita. Revisa internet y abre Strum de nuevo.',
+          service: 'Strum no arrancó a tiempo. Ciérralo y ábrelo de nuevo.',
+          other: 'Strum no pudo arrancar. Ciérralo y ábrelo de nuevo.',
+          logs: 'Registros',
+        },
+        pt: {
+          starting: 'Iniciando…',
+          setup: 'Preparando o Strum para a primeira execução. Leva um ou dois minutos e precisa de internet uma vez.',
+          files: 'Faltam arquivos do programa. Reinstale o Strum.',
+          download: 'Não foi possível baixar o que o Strum precisa. Confira a internet e abra o Strum de novo.',
+          service: 'O Strum não iniciou a tempo. Feche e abra de novo.',
+          other: 'O Strum não conseguiu iniciar. Feche e abra de novo.',
+          logs: 'Registros',
+        },
+        de: {
+          starting: 'Wird gestartet…',
+          setup: 'Strum wird für den ersten Start vorbereitet. Das dauert ein, zwei Minuten und braucht einmal Internet.',
+          files: 'Es fehlen Programmdateien. Installiere Strum neu.',
+          download: 'Was Strum braucht, ließ sich nicht laden. Prüfe das Internet und öffne Strum noch einmal.',
+          service: 'Strum ist nicht rechtzeitig gestartet. Schließe es und öffne es noch einmal.',
+          other: 'Strum konnte nicht starten. Schließe es und öffne es noch einmal.',
+          logs: 'Protokolle',
+        },
+        fr: {
+          starting: 'Démarrage…',
+          setup: 'Strum se prépare pour son premier lancement. Cela prend une minute ou deux et demande internet une fois.',
+          files: 'Il manque des fichiers du programme. Réinstalle Strum.',
+          download: "Impossible de télécharger ce dont Strum a besoin. Vérifie internet et rouvre Strum.",
+          service: "Strum n'a pas démarré à temps. Ferme-le et rouvre-le.",
+          other: "Strum n'a pas pu démarrer. Ferme-le et rouvre-le.",
+          logs: 'Journaux',
+        },
+        ja: {
+          starting: '起動中…',
+          setup: 'Strum を初回起動用に準備しています。1〜2 分かかり、一度だけインターネットが必要です。',
+          files: 'プログラムのファイルが足りません。Strum を再インストールしてください。',
+          download: 'Strum に必要なものをダウンロードできませんでした。インターネットを確かめて、もう一度 Strum を開いてください。',
+          service: 'Strum が時間内に起動しませんでした。閉じてから、もう一度開いてください。',
+          other: 'Strum を起動できませんでした。閉じてから、もう一度開いてください。',
+          logs: 'ログ',
+        },
+        zh: {
+          starting: '正在启动…',
+          setup: '正在为首次启动准备 Strum。需要一两分钟，并且要联网一次。',
+          files: '缺少程序文件。请重新安装 Strum。',
+          download: '无法下载 Strum 需要的内容。请检查网络，然后重新打开 Strum。',
+          service: 'Strum 没有及时启动。请关闭后重新打开。',
+          other: 'Strum 无法启动。请关闭后重新打开。',
+          logs: '日志',
+        },
       };
-      const lang = window.__strumLang === 'ru' ? 'ru' : 'en';
+      const system = (navigator.languages || []).map((tag) => tag.toLowerCase().split('-')[0]).find((code) => WORDS[code]);
+      const lang = WORDS[window.__strumLang] ? window.__strumLang : system || 'en';
       const w = WORDS[lang];
       document.documentElement.lang = lang;
       const main = document.getElementById('main');

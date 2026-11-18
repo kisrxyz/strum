@@ -3,17 +3,18 @@
 // tested without a screen.
 import type { EngineBuffer } from '../audio/native/protocol';
 import type { LatencyEstimate, LatencyRating } from '../dsp/latency';
-import { getLanguage, L } from '../i18n';
+import { L } from '../i18n';
+import { decimal } from '../i18n/lang';
 import type { GuitarPath, NativeLinkStatus } from '../state/runtime';
 import type { GuitarEngine } from '../state/settings';
 
 /** The native engine runs at 48 kHz only (it reports an error for a card that will not). */
 export const NATIVE_RATE = 48000;
 
-/** One decimal (a comma in Russian), and no «.0»: 2.667 → «2.7» / «2,7», 8 → «8». */
+/** One decimal (a comma where the language writes one), and no «.0»: 2.667 → «2.7» / «2,7», 8 → «8». */
 export function fmtMs1(ms: number): string {
   const text = String(Math.round(ms * 10) / 10);
-  return getLanguage() === 'ru' ? text.replace('.', ',') : text;
+  return decimal(text);
 }
 
 // ---- which controls «Вход» shows ----

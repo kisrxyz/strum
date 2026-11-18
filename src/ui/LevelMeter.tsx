@@ -4,6 +4,8 @@ import { useLang } from '../i18n/useLang';
 import { useEngineFrame } from './useEngineFrame';
 
 const FLOOR_DB = -60;
+/** The marks under the big meter, dBFS. */
+const SCALE_DB = [-48, -36, -24, -12, 0];
 const position = (db: number) => Math.min(1, Math.max(0, (db - FLOOR_DB) / -FLOOR_DB));
 
 /**
@@ -57,6 +59,13 @@ export function LevelMeter({ size }: { size: 'compact' | 'big' }) {
         <span className="meter__good" aria-hidden="true" />
         <span ref={fill} className="meter__fill" />
         <span ref={hold} className="meter__hold" />
+      </span>
+      <span className="meter__scale num" aria-hidden="true">
+        {SCALE_DB.map((db) => (
+          <i key={db} style={{ left: `${position(db) * 100}%` }}>
+            {db === 0 ? '0' : `−${-db}`}
+          </i>
+        ))}
       </span>
       <p ref={text} className="meter__text">
         {t.input.zones.silent}

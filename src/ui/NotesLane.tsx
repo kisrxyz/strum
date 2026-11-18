@@ -40,7 +40,7 @@ const LaneNote = memo(function LaneNote({ index, left, width, place, text, now, 
       type="button"
       className={`notes__note${now ? ' notes__note--now' : ''}${editing ? ' notes__note--edit' : ''}`}
       // Every note is as tall as its name; the rows above stay free for the bar and phrase numbers.
-      style={{ left: `${left}px`, width: `${width}px`, top: `calc(1.3rem + (100% - 1.3rem - 1.5rem - 4px) * ${place.toFixed(4)})` }}
+      style={{ left: `${left}px`, width: `${width}px`, top: `calc(1.5rem + (100% - 1.5rem - 1.375rem - 6px) * ${place.toFixed(4)})` }}
       title={title}
       onClick={() => funActions.openNoteEditor(index)}
     >
@@ -114,15 +114,11 @@ export function NotesLane({ song, analysis }: { song: Song; analysis: Analysis |
   const place = (midi: number) => 1 - Math.min(1, Math.max(0, (midi - low) / span));
 
   return (
-    <section className="chords notes" aria-label={t.songUi.notes.label}>
-      <div className="chords__now notes__now">
-        <span className="chords__name">{current >= 0 ? names[current] : '—'}</span>
-        <span className="chords__next">
-          {ahead >= 0 ? t.songUi.next(names[ahead]) : ' '}
-          {list.length > 0 && (
-            <span className="notes__phrase-no">{phraseNow >= 0 ? ` · ${t.songUi.notes.phraseOf(phraseNow + 1, list.length)}` : ''}</span>
-          )}
-        </span>
+    <section className="notes" aria-label={t.songUi.notes.label}>
+      <div className="notes__now">
+        <span className="notes__name num">{current >= 0 ? names[current] : '–'}</span>
+        <span className="notes__next">{ahead >= 0 ? t.songUi.next(names[ahead]) : ' '}</span>
+        {list.length > 0 && phraseNow >= 0 && <span className="notes__phrase-no">{t.songUi.notes.phraseOf(phraseNow + 1, list.length)}</span>}
       </div>
       <div ref={laneEl} className="lane notes__lane">
         {!notes.length ? (

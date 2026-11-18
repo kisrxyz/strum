@@ -159,9 +159,20 @@ describe('defaultGuitarEngine', () => {
 });
 
 describe('the language', () => {
-  it('is English on a fresh install, even on a Russian system', async () => {
+  it('is English on a fresh install when the system names no language Strum speaks', async () => {
     const { useSettings } = await load(WINDOWS);
     expect(useSettings.getState().language).toBe('en');
+    vi.resetModules();
+    vi.stubGlobal('navigator', { userAgent: WINDOWS, languages: ['kk-KZ', 'tr'] });
+    storage.data.clear();
+    expect((await import('./settings')).useSettings.getState().language).toBe('en');
+  });
+
+  it("is the system's language on a fresh install when Strum speaks it", async () => {
+    vi.resetModules();
+    vi.stubGlobal('navigator', { userAgent: WINDOWS, languages: ['pt-BR', 'en-US'] });
+    storage.data.clear();
+    expect((await import('./settings')).useSettings.getState().language).toBe('pt');
   });
 
   it('is Russian for settings saved before languages existed', async () => {
@@ -175,7 +186,7 @@ describe('the language', () => {
     expect(useSettings.getState().language).toBe('en');
     useSettings.getState().setLang('ru');
     expect(JSON.parse(storage.data.get('kvartirnik-settings')!).state.language).toBe('ru');
-    const again = await load(WINDOWS, { language: 'de' }, 4);
+    const again = await load(WINDOWS, { language: 'xx' }, 4);
     expect(again.useSettings.getState().language).toBe('en');
   });
 });

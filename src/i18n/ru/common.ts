@@ -1,7 +1,6 @@
 import type { Dict } from '../dict';
 
 export const common: Dict['common'] = {
-  ok: 'ОК',
   done: 'Готово',
   cancel: 'Отмена',
   close: 'Закрыть',
@@ -13,13 +12,10 @@ export const common: Dict['common'] = {
   none: 'нет',
   loading: 'Загрузка…',
   saving: 'Сохранение…',
-  pressAgainToDelete: 'Нажми ещё раз, чтобы удалить.',
   units: {
     db: 'дБ',
     ms: 'мс',
     hz: 'Гц',
-    khz: 'кГц',
-    s: 'с',
     pct: (n: number) => `${n} %`,
   },
 };

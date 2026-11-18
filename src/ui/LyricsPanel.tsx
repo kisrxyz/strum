@@ -1,3 +1,4 @@
+import { FileText, Pencil } from 'lucide-react';
 import { memo, useRef, useState, type CSSProperties } from 'react';
 import { useLang } from '../i18n/useLang';
 import { lineAt, type TimedLine } from '../lyrics/align';
@@ -133,11 +134,18 @@ export function LyricsPanel({ song, analysis }: { song: Song; analysis: Analysis
 
   if (!lyrics) {
     return (
-      <div className="lyr lyr--empty">
-        <p>{l.emptyText}</p>
-        <button type="button" className="btn" onClick={() => useSong.getState().patch({ editingLyrics: true })}>
-          {l.edit}
-        </button>
+      <div className="empty">
+        <FileText size={36} />
+        <h2 className="empty__title">{l.emptyTitle}</h2>
+        <p className="empty__text">{l.emptyText}</p>
+        <div className="empty__actions">
+          <button type="button" className="btn btn--primary btn--lg" onClick={() => useSong.getState().patch({ editingLyrics: true })}>
+            {l.add}
+          </button>
+          <button type="button" className="btn btn--lg" onClick={() => void textActions.findOnline()}>
+            {t.songUi.lyricsEditor.findOnline}
+          </button>
+        </div>
       </div>
     );
   }
@@ -166,18 +174,14 @@ export function LyricsPanel({ song, analysis }: { song: Song; analysis: Analysis
 
   return (
     <div className="lyr">
-      <div className="lyr__tools">
+      <div className="view-tools">
         {lyrics.shift !== 0 && (
-          <button
-            type="button"
-            className="btn btn--quiet"
-            title={l.shiftTip(shift)}
-            onClick={() => textActions.toggleShift()}
-          >
+          <button type="button" className="btn btn--sm btn--ghost" title={l.shiftTip(shift)} onClick={() => textActions.toggleShift()}>
             {l.shiftButton(shift)}
           </button>
         )}
-        <button type="button" className="btn btn--quiet" onClick={() => useSong.getState().patch({ editingLyrics: true })}>
+        <button type="button" className="btn btn--sm btn--ghost" onClick={() => useSong.getState().patch({ editingLyrics: true })}>
+          <Pencil size={14} />
           {l.edit}
         </button>
       </div>

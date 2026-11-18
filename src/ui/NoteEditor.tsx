@@ -29,36 +29,38 @@ export function NoteEditor({ song, analysis }: { song: Song; analysis: Analysis 
   };
 
   return (
-    <section className="chordedit" aria-label={e.label}>
-      <div className="chordedit__head">
-        <span className="chordedit__what">
+    <section className="editor" aria-label={e.label}>
+      <div className="panel-head">
+        <span className="panel-head__title">{e.label}</span>
+        <span className="editor__what num">
           {name}
           <sub>{octave}</sub> · {fmtTime(note.start)} · {Math.round((note.end - note.start) * 1000)} {t.common.units.ms}
         </span>
-        <button type="button" className="chordedit__act" disabled={index === 0} onClick={() => go(index - 1)}>
+        <button type="button" className="btn btn--sm btn--ghost" disabled={index === 0} onClick={() => go(index - 1)}>
           {t.songUi.prevItem}
         </button>
-        <button type="button" className="chordedit__act" disabled={index >= notes.length - 1} onClick={() => go(index + 1)}>
+        <button type="button" className="btn btn--sm btn--ghost" disabled={index >= notes.length - 1} onClick={() => go(index + 1)}>
           {t.songUi.nextItem}
         </button>
-        <button type="button" className="chordedit__act chordedit__done" onClick={() => funActions.openNoteEditor(null)}>
+        <button type="button" className="btn btn--sm btn--primary" onClick={() => funActions.openNoteEditor(null)}>
           {t.common.done}
         </button>
       </div>
-      <div className="chordedit__row" role="group" aria-label={e.note}>
-        <button type="button" className="chordedit__btn" onClick={() => funActions.editNote(index, 'down')}>
+      <div className="editor__body">
+      <div className="editor__row" role="group" aria-label={e.note}>
+        <button type="button" className="keybtn" onClick={() => funActions.editNote(index, 'down')}>
           {e.down}
         </button>
-        <button type="button" className="chordedit__btn" onClick={() => funActions.editNote(index, 'up')}>
+        <button type="button" className="keybtn" onClick={() => funActions.editNote(index, 'up')}>
           {e.up}
         </button>
-        <button type="button" className="chordedit__btn" onClick={() => funActions.editNote(index, 'remove')}>
+        <button type="button" className="keybtn" onClick={() => funActions.editNote(index, 'remove')}>
           {e.remove}
         </button>
         {song.guitarNotes && (
           <button
             type="button"
-            className="chordedit__btn"
+            className="keybtn"
             onClick={() => {
               if (Date.now() > resetUntil) {
                 setResetUntil(Date.now() + 4000);
@@ -70,6 +72,7 @@ export function NoteEditor({ song, analysis }: { song: Song; analysis: Analysis 
             {Date.now() < resetUntil ? e.restoreAll : t.songUi.restore}
           </button>
         )}
+      </div>
       </div>
     </section>
   );

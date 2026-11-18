@@ -1,7 +1,9 @@
+import { addAmpFiles } from './ampFiles';
 import { runtimeInfo, soundMayStart } from './boot';
+import { LucideProvider } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { classifyDrop } from '../audio/assetFiles';
-import { addUserAsset, listUserAssets } from '../audio/assets';
+import { listUserAssets } from '../audio/assets';
 import { bindEngine } from '../audio/bindings';
 import { engine } from '../audio/engine';
 import { L } from '../i18n';
@@ -21,7 +23,7 @@ import { useRuntime, type View } from '../state/runtime';
 import { useSettings } from '../state/settings';
 import { useSong } from '../state/song';
 import { AmpScreen } from '../ui/AmpScreen';
-import { InputScreen } from '../ui/InputScreen';
+import { SettingsScreen } from '../ui/SettingsScreen';
 import { LibraryScreen } from '../ui/LibraryScreen';
 import { BigTuner, DropZone, ToastView } from '../ui/Overlays';
 import { KeysSheet } from '../ui/KeysSheet';
@@ -29,7 +31,8 @@ import { AboutSheet } from '../ui/AboutSheet';
 import { SongScreen } from '../ui/SongScreen';
 import { StageOverlay } from '../ui/StageOverlay';
 import { StartOverlay } from '../ui/StartOverlay';
-import { TopBar } from '../ui/TopBar';
+import { Rail } from '../ui/Rail';
+import { StatusBar } from '../ui/StatusBar';
 import { keyToAction, type Action } from './keys';
 
 const toggleView = (target: View) => {
@@ -347,21 +350,6 @@ function ownsKeyboard(target: EventTarget | null): boolean {
   return target instanceof HTMLInputElement && target.type !== 'range';
 }
 
-async function addAmpFiles(files: File[]): Promise<void> {
-  const rt = useRuntime.getState();
-  for (const file of files) {
-    try {
-      const info = await addUserAsset(file);
-      rt.patch({ userAssets: await listUserAssets() });
-      const st = useSettings.getState();
-      st.updatePreset(st.presetIndex, info.kind === 'model' ? { amp: { model: info.id } } : { cab: info.id });
-      rt.showToast(info.kind === 'model' ? L().shell.modelAdded(info.name) : L().shell.cabinetAdded(info.name));
-    } catch (error) {
-      rt.showToast(error instanceof Error ? error.message : L().shell.fileRejected, 'warn');
-    }
-  }
-}
-
 /**
  * A dropped tab is the open recording's tab only when its «Табы» view is on screen; anywhere else
  * it becomes a song of its own that the app plays by itself.
@@ -485,16 +473,21 @@ export function App() {
   }, []);
 
   return (
-    <div className="app">
-      <TopBar />
-      {view === 'input' ? <InputScreen /> : view === 'amp' ? <AmpScreen /> : view === 'library' ? <LibraryScreen /> : <SongScreen />}
-      <BigTuner />
-      <KeysSheet />
-      <AboutSheet />
-      <StageOverlay />
-      <StartOverlay />
-      <DropZone active={dragging} />
-      <ToastView />
-    </div>
+    <LucideProvider size={18} strokeWidth={1.75}>
+      <div className="app">
+        <Rail />
+        <div className="app__main">
+          {view === 'input' ? <SettingsScreen /> : view === 'amp' ? <AmpScreen /> : view === 'library' ? <LibraryScreen /> : <SongScreen />}
+          <StatusBar />
+        </div>
+        <BigTuner />
+        <KeysSheet />
+        <AboutSheet />
+        <StageOverlay />
+        <StartOverlay />
+        <DropZone active={dragging} />
+        <ToastView />
+      </div>
+    </LucideProvider>
   );
 }

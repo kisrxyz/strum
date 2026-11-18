@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@coderline/alphatab": "^1.9.0",
+    "lucide-react": "1.70.0",
     "neural-amp-modeler-wasm": "^3.0.7",
     "pitchy": "^4.1.0",
     "react": "^19.3.1",

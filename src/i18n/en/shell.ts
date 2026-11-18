@@ -1,9 +1,14 @@
 // Namespace `shell`: the top bar, the start screen, the overlays and the window-wide toasts.
 // See ../README.md for the copy rules and the glossary.
 export const shell = {
-  screens: { song: 'Song', library: 'Songs', amp: 'Amp', input: 'Input' },
+  /** The words under the icons of the left panel: keep each to about nine letters. */
+  screens: { song: 'Player', library: 'Songs', amp: 'Amp', input: 'Settings' },
   screensLabel: 'Screens',
-  presets: 'Presets',
+  presetPrev: 'Previous preset',
+  presetNext: 'Next preset',
+  openAmp: 'Open the amp',
+  /** The status bar, before the sound has started. */
+  soundOff: 'Sound is off',
   setlistPlace: (place: number, total: number) => `Set list ${place} of ${total}`,
   radio: 'Radio',
   record: 'Record',
@@ -28,7 +33,6 @@ export const shell = {
     },
   },
 
-  bigTuner: 'Big tuner',
   bigTunerClose: 'Press T or Esc to close',
   dropZone: 'Drop to add: a song (mp3, m4a, wav, flac), a Guitar Pro tab, an amp model (.nam) or a cabinet (.wav)',
 

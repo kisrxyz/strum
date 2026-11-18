@@ -4,6 +4,8 @@ Play your guitar through amp models with the songs you love — without their gu
 
 [Русский](README.ru.md)
 
+The program itself speaks English, Russian, Spanish, Portuguese, German, French, Japanese and Chinese: Settings → Language.
+
 ![The song screen: the chords follow the recording, the fretboard shows the fingering](.github/images/song.png)
 
 - **Amp.** Plug the guitar into an audio interface and play through captures of real amps (Fender, Marshall, Vox, Peavey, Friedman…) with cabinets, a noise gate that finds your noise floor itself, a hum filter, chorus, delay and reverb. Four presets, a pedal on PageUp / PageDown.

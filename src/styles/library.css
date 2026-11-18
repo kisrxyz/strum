@@ -1,514 +1,575 @@
-/* ---------- «Песни»: the list on the left, the song's card on the right ---------- */
+/*
+ * Songs: the lists on the left, the table of the list in the middle (the search and Add song over
+ * it), the highlighted song's properties on the right. Panels sit edge to edge.
+ */
+
 .lib {
+  display: grid;
+  grid-template-columns: 13rem minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ---------- the lists ---------- */
+
+.lib__lists {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  /* The window's height below the top bar (measured in LibraryScreen): the list scrolls, the page does not. */
-  height: calc(100vh - var(--lib-top, 3.25rem));
-  min-height: 24rem;
-  padding: 1.5rem 1.25rem 1.25rem;
+  gap: 2px;
+  padding: 0.5rem;
+  border-right: 1px solid var(--line);
+  background: var(--panel);
 }
 
-/* The head: «Песни 7», then the search, «Случайная», «Радио», «Добавить песню». */
-.lib__head {
+.lib__list {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem 1.5rem;
+  gap: 0.625rem;
+  height: 2rem;
+  padding: 0 0.5rem 0 0.625rem;
+  border: 0;
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--text-2);
+  font-size: var(--fs);
+  text-align: left;
+  transition:
+    background-color 0.12s var(--ease),
+    color 0.12s var(--ease);
 }
 
-.lib__head h1 {
-  font-size: 1.75rem;
-  line-height: 1.15;
+.lib__list > span:first-of-type {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lib__list:hover {
+  background: var(--control);
+  color: var(--text);
+}
+
+.lib__list[aria-current='true'] {
+  background: var(--control);
+  color: var(--text);
+}
+
+.lib__list[aria-current='true'] svg {
+  color: var(--accent);
+}
+
+/* The takes are not songs: a line apart from the songs' lists. */
+.lib__list--takes {
+  position: relative;
+  margin-top: 0.5625rem;
+}
+
+.lib__list--takes::before {
+  position: absolute;
+  top: -0.3125rem;
+  right: 0.25rem;
+  left: 0.25rem;
+  height: 1px;
+  background: var(--line);
+  content: '';
 }
 
 .lib__count {
-  margin-left: 0.25rem;
   color: var(--text-3);
-  font-size: 1rem;
+  font-size: var(--fs-sm);
 }
 
-.lib__tools {
+/* ---------- the middle ---------- */
+
+.lib__main {
   display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.625rem;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
 }
 
-.lib__tools .addsong {
-  flex-direction: row-reverse;
+.lib__bar {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 0.5rem;
+  height: 3rem;
+  padding: 0 0.75rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.lib__bargap {
+  flex: 1;
 }
 
 .lib__search {
-  position: relative;
-  flex: 0 1 18rem;
-  min-width: 10rem;
-}
-
-.lib__search .input-text {
-  width: 100%;
-}
-
-.lib__tools .btn kbd {
-  margin-right: -0.25rem;
-}
-
-.lib__tabs {
-  align-self: flex-start;
-}
-
-.lib__tabcount {
-  margin-left: 0.125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: min(22rem, 40%);
+  height: var(--h-lg);
+  padding: 0 0.625rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--well);
   color: var(--text-3);
+  cursor: text;
+  transition: border-color 0.12s var(--ease);
+}
+
+.lib__search:hover {
+  border-color: var(--line-2);
+}
+
+.lib__search:focus-within {
+  border-color: var(--accent-line);
+}
+
+.lib__search input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: var(--fs);
+}
+
+.lib__search input::placeholder {
+  color: var(--text-3);
+}
+
+.lib__search input::-webkit-search-cancel-button {
+  filter: invert(0.7);
 }
 
 .lib__offline {
-  margin: 0;
+  flex: none;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--line);
   color: var(--cold);
-  font-size: 0.875rem;
+  font-size: var(--fs);
 }
 
-/* The installed app's first start: song separation downloading (SetupNote.tsx). */
-.lib__setup {
-  display: grid;
-  gap: 0.375rem;
-  max-width: 44rem;
-}
-
-.lib__setup-line {
+/* Song separation is not downloaded yet (the installed app's first start). */
+.setup {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  flex: none;
+  gap: 0.875rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text-2);
 }
 
-.lib__setup-text {
-  font-size: 0.9375rem;
+.setup__words {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
 }
 
-.lib__setup-text--error {
-  color: var(--cold);
+.setup__text {
+  color: var(--text);
+  font-size: var(--fs-md);
 }
 
-.lib__setup-bar {
-  height: 3px;
-  border-radius: 2px;
-  background: var(--line);
-  overflow: hidden;
-}
-
-.lib__setup-bar span {
-  display: block;
-  height: 100%;
-  background: var(--accent);
-  transition: width 0.5s var(--ease);
-}
-
-.lib__setup-hint {
-  margin: 0;
-  color: var(--text-3);
-  font-size: 0.8125rem;
+.setup__bar {
+  max-width: 28rem;
+  margin-top: 0.375rem;
 }
 
 .lib__body {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(22rem, 1fr);
-  align-items: start;
-  flex: 1 1 0;
-  gap: 1.25rem;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) auto;
   min-height: 0;
 }
 
-/* ---------- the list ---------- */
-.lib-list {
-  max-height: 100%;
+/* ---------- the table ---------- */
+
+.table {
+  --cols: 2.5rem minmax(10rem, 1.5fr) minmax(7rem, 1fr) 4rem 3.5rem 4rem 4.5rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.table--takes {
+  --cols: 2.5rem minmax(10rem, 1.5fr) minmax(9rem, 1fr) minmax(8rem, 1fr) 4rem;
+}
+
+.table__head,
+.trow {
+  display: grid;
+  grid-template-columns: var(--cols);
+  align-items: center;
+  column-gap: 0.75rem;
+  padding: 0 1rem 0 0.5rem;
+}
+
+.table__head {
+  flex: none;
+  height: 1.875rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+}
+
+.table__num {
+  text-align: right;
+}
+
+.table__body {
+  flex: 1;
+  min-height: 0;
   margin: 0;
-  padding: 0;
+  padding: 0.25rem 0;
   overflow-y: auto;
-  border-top: 1px solid var(--line);
   list-style: none;
 }
 
-.lib-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 3.5rem 5rem 3.5rem;
-  align-items: center;
-  gap: 1rem;
+.trow {
   width: 100%;
-  height: 3.75rem;
-  padding: 0 0.75rem;
+  height: 2.5rem;
   border: 0;
-  border-bottom: 1px solid var(--line);
   background: transparent;
-  color: var(--text);
+  color: var(--text-2);
+  font-size: var(--fs);
   text-align: left;
-  transition: background-color 0.15s var(--ease);
 }
 
-.lib-list[data-list='set'] .lib-row {
-  grid-template-columns: 1.5rem minmax(0, 1fr) 3.5rem 5rem 3.5rem;
+.trow:hover {
+  background: rgba(255, 255, 255, 0.03);
 }
 
-.lib-row:hover {
-  background: var(--surface);
+.trow[aria-current='true'] {
+  background: var(--control);
+  color: var(--text);
 }
 
-.lib-row[aria-current='true'] {
-  border-bottom-color: transparent;
-  border-radius: var(--r-sm);
-  background: var(--raised);
-}
-
-/* The row above the selected one keeps no hairline against the raised surface. */
-.lib-list li:has(+ li > .lib-row[aria-current='true']) .lib-row {
-  border-bottom-color: transparent;
-}
-
-.lib-row__main {
+.trow__lead {
   display: grid;
+  place-items: center;
+  color: var(--text-3);
+  font-size: var(--fs);
+}
+
+.trow__title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
   min-width: 0;
 }
 
-.lib-row__title,
-.lib-row__sub {
+.trow__name {
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--fs-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trow__status {
+  flex: none;
+  max-width: 55%;
+  overflow: hidden;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trow__status--error {
+  color: var(--cold);
+}
+
+.trow__cell {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.lib-row__title {
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.lib-row__sub {
-  color: var(--text-2);
-  font-size: 0.8125rem;
-}
-
-.lib-row__mark,
-.lib-row__status {
-  color: var(--text-3);
-}
-
-.lib-row__status--error {
-  color: var(--cold);
-}
-
-.lib-row__place {
-  color: var(--text-3);
-  font-size: 0.875rem;
+.trow__num {
   text-align: right;
 }
 
-.lib-row__fig {
+.trow__marks {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
   color: var(--text-3);
-  font-size: 0.875rem;
-  text-align: right;
-  white-space: nowrap;
+  font-size: var(--fs-sm);
 }
 
-.lib-row[aria-current='true'] .lib-row__fig {
-  color: var(--text-2);
+.trow__marks > span {
+  display: inline-flex;
 }
 
-.lib-list__empty {
-  padding: 1rem 0.75rem;
+.trow__fav {
+  color: var(--accent);
+}
+
+/* The song that is open in the player. */
+.trow--open .trow__lead,
+.trow--open .trow__name {
+  color: var(--accent);
+}
+
+.table__empty {
+  padding: 1.5rem 1.25rem;
   color: var(--text-3);
-  font-size: 0.9375rem;
+  font-size: var(--fs);
+  line-height: 1.5;
 }
 
-/* ---------- the card ---------- */
-.lib-card {
+.table__empty .empty {
+  height: auto;
+  padding-top: 12vh;
+}
+
+/* ---------- the properties of the highlighted song or take ---------- */
+
+.info {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  max-height: 100%;
-  min-width: 0;
-  padding: 1.5rem;
+  gap: 0.875rem;
+  width: 20rem;
+  min-height: 0;
+  padding: 1rem;
   overflow-y: auto;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface);
+  border-left: 1px solid var(--line);
+  background: var(--panel);
 }
 
-.lib-card__names {
-  display: grid;
-  gap: 0.125rem;
+.info__names {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
 }
 
-.lib-card__names h2 {
-  font-size: inherit;
-}
-
-/* Title and artist: a heading and a subtitle that turn into fields on hover and focus. */
-.lib-card__title,
-.lib-card__artist {
-  width: calc(100% + 0.75rem);
-  margin-left: -0.375rem;
-  padding: 0.0625rem 0.375rem;
+/* Title and artist read as text until hovered or focused: then they are fields. */
+.info__name {
+  width: 100%;
+  margin: 0 -0.375rem;
+  padding: 0.125rem 0.375rem;
   border: 1px solid transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r);
   background: transparent;
-  outline: none;
   text-overflow: ellipsis;
   transition:
-    background-color 0.15s var(--ease),
-    border-color 0.15s var(--ease);
+    border-color 0.12s var(--ease),
+    background-color 0.12s var(--ease);
 }
 
-.lib-card__title {
-  color: var(--text);
-  font-size: 1.75rem;
-  font-weight: 500;
-  line-height: 1.2;
-}
-
-.lib-card__artist {
-  color: var(--text-2);
-  font-size: 1rem;
-}
-
-.lib-card__title::placeholder,
-.lib-card__artist::placeholder {
-  color: var(--text-3);
-}
-
-.lib-card__title:hover,
-.lib-card__artist:hover {
+.info__name:hover {
   border-color: var(--line-2);
 }
 
-.lib-card__title:focus,
-.lib-card__artist:focus {
-  border-color: var(--text-3);
-  background: var(--bg);
-  outline: none;
+.info__name:focus-visible {
+  border-color: var(--accent-line);
+  outline: 0;
+  background: var(--well);
 }
 
-/* Длина / Тональность / Темп / Строй: captions over figures. */
-.lib-card__facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 1.75rem;
-  margin: 0;
-}
-
-.lib-card__facts div {
-  display: grid;
-  gap: 0.125rem;
-}
-
-.lib-card__facts dt {
-  color: var(--text-3);
-  font-size: 0.8125rem;
-}
-
-.lib-card__facts dd {
-  margin: 0;
+.info__name--title,
+.info__title {
+  color: var(--text);
   font-size: 1.125rem;
-  font-weight: 500;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
-.lib-card__capo {
+.info__name--artist,
+.info__artist {
   color: var(--text-2);
-  font-weight: 400;
+  font-size: var(--fs-md);
 }
 
-/* What is ready: a filled dot, or an empty ring when not yet. */
-.lib-card__ready {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.125rem;
-  margin: 0;
-  padding: 0;
-  color: var(--text-2);
-  font-size: 0.875rem;
-  list-style: none;
-}
-
-.lib-card__ready li {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4375rem;
-}
-
-.lib-card__ready li::before {
-  width: 0.375rem;
-  height: 0.375rem;
-  border: 1px solid var(--text-2);
-  border-radius: 50%;
-  background: var(--text-2);
-  content: '';
-}
-
-.lib-card__ready li[data-on='false'] {
-  color: var(--text-3);
-}
-
-.lib-card__ready li[data-on='false']::before {
-  border-color: var(--text-3);
-  background: transparent;
-}
-
-.lib-card__go {
-  display: flex;
-}
-
-.lib-card__lists {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.lib-card__lists .btn kbd {
-  margin-right: -0.25rem;
-}
-
-.lib-card__order {
-  display: inline-flex;
-  gap: 0.125rem;
-}
-
-.lib-card__order .btn {
-  width: 2.25rem;
-  padding: 0;
-}
-
-.lib-card__notes {
+.info__go {
   flex: none;
-  width: 100%;
-  height: auto;
-  min-height: 4.5rem;
-  padding: 0.625rem 0.75rem;
-  line-height: 1.45;
-  resize: vertical;
+  justify-content: flex-start;
+  height: 2.25rem;
 }
 
-.lib-card__foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
+.info__go kbd {
+  margin-left: auto;
 }
 
-.lib-card__foot .link[aria-expanded='true'] {
-  color: var(--text-2);
-}
-
-/* «Разделение и анализ»: each model, the bars and chords. */
-.lib-card__more {
+.info__facts {
   display: grid;
-  gap: 0.875rem;
-  margin-top: -0.25rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--line);
-}
-
-.lib-job {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 0.125rem 1rem;
-}
-
-.lib-job__name {
-  font-size: 0.9375rem;
-  font-weight: 500;
-}
-
-.lib-job__playing {
-  color: var(--text-3);
-  font-weight: 400;
-}
-
-.lib-job__state {
-  grid-column: 1;
-  color: var(--text-2);
-  font-size: 0.8125rem;
-}
-
-.lib-job__action {
-  grid-column: 2;
-  grid-row: 1;
-  text-align: right;
-}
-
-.lib-job__note {
-  grid-column: 1 / -1;
-  color: var(--cold);
-  font-size: 0.8125rem;
-}
-
-/* «Добавить песню» (here and on the empty song screen) with the import's progress. */
-.addsong {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
-}
-
-.addsong__progress {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
   overflow: hidden;
-  color: var(--text-2);
-  font-size: 0.8125rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--line);
+}
+
+.info__facts--two {
+  grid-template-columns: 1.4fr 1fr;
+}
+
+.info__facts > div {
+  min-width: 0;
+  padding: 0.375rem 0.5rem 0.4375rem;
+  background: var(--well);
+}
+
+.info__facts dt {
+  overflow: hidden;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Narrow windows: the card under the list. */
-@media (max-width: 1000px) {
-  .lib {
-    height: auto;
-  }
-
-  .lib__body {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .lib-list {
-    max-height: 60vh;
-  }
-}
-
-/* ---------- «Записи» ---------- */
-.lib-list[data-list='takes'] .lib-row {
-  grid-template-columns: minmax(0, 1fr) 3.5rem;
-}
-
-.lib-card__names .take-card__title {
+.info__facts dd {
+  margin: 0.125rem 0 0;
+  overflow: hidden;
   color: var(--text);
-  font-size: 1.75rem;
-  font-weight: 500;
+  font-size: var(--fs-md);
   line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.take-card__artist {
+.info__ready {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.875rem;
   margin: 0;
-  color: var(--text-2);
-  font-size: 1rem;
+  padding: 0;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  list-style: none;
 }
 
-.take-card__nudge {
-  display: grid;
+.info__ready li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.info__ready li[data-on='true'] {
+  color: var(--text);
+}
+
+.info__ready li[data-on='true'] svg {
+  color: var(--accent);
+}
+
+.info__lists {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.info__order {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.info__notes {
+  flex: none;
+  min-height: 4rem;
+}
+
+.info__seek {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+
+.info__nudge {
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
-.take-card__nudge-label {
-  color: var(--text-2);
-  font-size: 0.875rem;
+.info__nudgerow {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
 }
 
-.take-card__nudge-row {
+.info__nudgerow .readout {
+  flex: 1;
+  justify-content: center;
+  height: var(--h);
+  line-height: calc(var(--h) - 2px);
+}
+
+.info__foot {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
 }
 
-.take-card__offset {
-  min-width: 4.5em;
-  font-family: var(--font-num);
-  text-align: center;
+.info__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-decoration: none;
+}
+
+.info__jobs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.job {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.125rem 0.75rem;
+  font-size: var(--fs-sm);
+}
+
+.job__name {
+  grid-column: 1 / -1;
+  color: var(--text);
+  font-size: var(--fs);
+}
+
+.job__playing {
+  margin-left: 0.5rem;
+  color: var(--accent);
+  font-size: var(--fs-sm);
+}
+
+.job__state {
+  color: var(--text-3);
+}
+
+.job__note {
+  grid-column: 1 / -1;
+  color: var(--text-3);
+}
+
+/* Narrow windows: the lists shrink to their icons' column. */
+@media (max-width: 1180px) {
+  .lib {
+    grid-template-columns: 11rem minmax(0, 1fr);
+  }
+
+  .info {
+    width: 17.5rem;
+  }
 }

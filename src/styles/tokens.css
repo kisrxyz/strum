@@ -1,48 +1,95 @@
 /*
- * Квартирник — design tokens and base elements (redesign 2026-11-14).
- * Warm graphite, one amber accent for what matters now. Warm = on target, neutral = close,
- * cold = off. Never red. Fonts are the system's own: nothing is downloaded at runtime.
+ * Strum — design tokens and base elements (design of 2026-11-18, docs/superpowers/specs/2026-11-18-pro-design.md).
+ * Neutral graphite panels that sit edge to edge; one amber for «now» and «on»; cold for «off the note»
+ * and errors, never red. Colour of its own belongs to content only: stems and song sections.
+ * Fonts are the system's own: nothing is downloaded at runtime.
  */
 :root {
-  --bg: #131211;
-  --surface: #1a1917;
-  --raised: #242220;
-  --raised-2: #2e2b28;
-  --line: rgba(239, 233, 222, 0.08);
-  --line-2: rgba(239, 233, 222, 0.14);
-  --text: #efe9de;
-  --text-2: #aaa398;
-  --text-3: #857f75;
-  --accent: #f2a24a;
-  --accent-hover: #f5b062;
-  --accent-ink: #1d1307;
-  --accent-soft: rgba(242, 162, 74, 0.13);
-  --warm: #f2a24a;
-  --neutral: #e9ddcd;
-  --cold: #74abcb;
-  --cold-soft: rgba(116, 171, 203, 0.14);
+  /* Surfaces, from the window's base up to a pressed control. */
+  --bg: #141517;
+  --panel: #1b1c1f;
+  --panel-2: #212327;
+  --control: #2a2c31;
+  --control-hover: #33363c;
+  --control-active: #3d4047;
+  /* Sunk fields: readouts, meter tracks, the timeline. */
+  --well: #0e0f11;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-2: rgba(255, 255, 255, 0.12);
+  --line-3: rgba(255, 255, 255, 0.2);
 
-  --r-sm: 6px;
-  --r: 10px;
-  --r-lg: 14px;
+  --text: #e9eaec;
+  --text-2: #a6a9b0;
+  --text-3: #848891;
+
+  --accent: #ffad33;
+  --accent-hover: #ffbd5c;
+  --accent-ink: #1c1203;
+  --accent-soft: rgba(255, 173, 51, 0.13);
+  --accent-line: rgba(255, 173, 51, 0.42);
+  --primary: #e9eaec;
+  --primary-hover: #ffffff;
+  --primary-ink: #141517;
+
+  /* Note feedback: on the note, close, off. */
+  --warm: var(--accent);
+  --neutral: #d9dce1;
+  --cold: #6fb2d9;
+  --cold-soft: rgba(111, 178, 217, 0.14);
+  --cold-line: rgba(111, 178, 217, 0.45);
+
+  /* Content colours: the stems of a song and its sections. */
+  --stem-vocals: #e07aa8;
+  --stem-drums: #9d8fe0;
+  --stem-bass: #5aa9e6;
+  --stem-guitar: #ffad33;
+  --stem-piano: #4fc4a3;
+  --stem-other: #9aa0aa;
+  --sec-intro: #8b919c;
+  --sec-verse: #6a9bd8;
+  --sec-chorus: #ffad33;
+  --sec-bridge: #4fc4a3;
+  --sec-solo: #c58be0;
+  --sec-outro: #8b919c;
+  --sec-other: #8b919c;
+
+  --r-sm: 3px;
+  --r: 4px;
+  --r-lg: 6px;
+  --r-xl: 8px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
 
-  --font: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  /* Type: 12–13 px for the interface, 14 for lists; big only what is read with the guitar in hand. */
+  --fs-xs: 0.6875rem;
+  --fs-sm: 0.75rem;
+  --fs: 0.8125rem;
+  --fs-md: 0.875rem;
+  --fs-lg: 1rem;
+  --fs-xl: 1.25rem;
+
+  /* Control heights. */
+  --h-sm: 1.5rem;
+  --h: 1.75rem;
+  --h-lg: 2rem;
+
+  --rail-w: 4.25rem;
+  --status-h: 1.75rem;
+
+  --font: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
   /* Chord names, time and figures: Windows' Bahnschrift (DIN), close cousins on macOS. */
   --font-num: Bahnschrift, 'DIN Alternate', 'Avenir Next Condensed', 'Segoe UI', sans-serif;
 
-  /* Old names, kept while the screens move to the tokens above. */
-  --bg-2: var(--bg);
-  --surface-2: var(--raised);
-  --surface-3: var(--raised-2);
-  --warm-2: var(--accent);
-  --warm-glow: rgba(242, 162, 74, 0.22);
-  --cold-glow: rgba(116, 171, 203, 0.18);
-  --hot: var(--accent);
-  --radius: var(--r-lg);
-  --radius-sm: var(--r);
-
   color-scheme: dark;
+}
+
+/* Japanese and Chinese: the system's own interface faces come first. */
+:root:lang(ja) {
+  --font: 'Segoe UI Variable Text', 'Segoe UI', 'Yu Gothic UI', 'Meiryo UI', 'Hiragino Sans', system-ui, sans-serif;
+}
+
+:root:lang(zh) {
+  --font: 'Segoe UI Variable Text', 'Segoe UI', 'Microsoft YaHei UI', 'PingFang SC', system-ui, sans-serif;
 }
 
 * {
@@ -50,17 +97,32 @@
 }
 
 html {
-  /* Read at the laptop (50–80 cm): 15 px at 1280 wide, 16 at 1536, 19 at 1920. */
-  font-size: clamp(15px, calc(8px + 0.55vw), 19px);
+  font-size: 16px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
 }
 
 body {
   margin: 0;
+  overflow: hidden;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
+  font-size: var(--fs);
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+}
+
+input,
+textarea,
+[contenteditable] {
+  user-select: text;
 }
 
 button,
@@ -75,33 +137,49 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: default;
+}
+
 button:focus-visible,
 select:focus-visible,
 input:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+[role='slider']:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 
-kbd {
-  display: inline-block;
-  min-width: 1.5em;
-  padding: 0 0.35em;
-  border: 1px solid var(--line-2);
-  border-bottom-width: 2px;
-  border-radius: 4px;
-  background: var(--raised);
-  color: var(--text-2);
-  font: 500 0.75rem/1.35 var(--font);
-  text-align: center;
-  white-space: nowrap;
+h1,
+h2,
+h3,
+p {
+  margin: 0;
 }
 
 h1,
 h2,
 h3 {
-  margin: 0;
-  font-weight: 500;
+  font-weight: 600;
+}
+
+svg {
+  flex: none;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.3125rem;
+  border: 1px solid var(--line-2);
+  border-bottom-width: 2px;
+  border-radius: var(--r);
+  background: var(--control);
+  color: var(--text-2);
+  font: 400 var(--fs-xs) / 1.0625rem var(--font);
+  text-align: center;
+  white-space: nowrap;
 }
 
 .num {
@@ -109,50 +187,12 @@ h3 {
   font-variant-numeric: tabular-nums;
 }
 
-input[type='range'] {
-  width: 100%;
-  height: 1.25rem;
-  margin: 0;
-  background: transparent;
-  appearance: none;
-  cursor: pointer;
-}
-
-input[type='range']::-webkit-slider-runnable-track {
-  height: 3px;
-  border-radius: 2px;
-  background: var(--raised-2);
-}
-
-input[type='range']::-webkit-slider-thumb {
-  width: 0.875rem;
-  height: 0.875rem;
-  margin-top: calc(1.5px - 0.4375rem);
-  border: 0;
-  border-radius: 50%;
-  background: var(--text);
-  appearance: none;
-  transition: transform 0.12s var(--ease);
-}
-
-input[type='range']:hover::-webkit-slider-thumb {
-  transform: scale(1.15);
-}
-
-input[type='range']:disabled {
-  cursor: default;
-}
-
-input[type='range']:disabled::-webkit-slider-thumb {
-  background: var(--text-3);
-}
-
 code {
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: var(--raised);
+  padding: 1px 5px;
+  border-radius: var(--r-sm);
+  background: var(--control);
   font-family: ui-monospace, Consolas, monospace;
-  font-size: 0.9em;
+  font-size: 0.92em;
 }
 
 ::-webkit-scrollbar {
@@ -162,10 +202,19 @@ code {
 
 ::-webkit-scrollbar-thumb {
   border: 3px solid transparent;
-  border-radius: 6px;
-  background: var(--raised-2) padding-box;
+  border-radius: 5px;
+  background: var(--control-active) padding-box;
 }
 
-::-webkit-scrollbar-track {
+::-webkit-scrollbar-thumb:hover {
+  background: #555962 padding-box;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+::selection {
+  background: rgba(255, 173, 51, 0.3);
 }

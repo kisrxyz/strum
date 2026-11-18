@@ -113,10 +113,10 @@ export function Fretboard({
   const { w, h } = size;
   if (!w || !h) return <div ref={wrap} className="fret" aria-label={t.songUi.fretboard} />;
 
-  const padTop = 6;
-  const padBottom = 24;
-  const openW = Math.max(28, w * 0.035);
-  const fw = (w - openW - 4) / FRETS;
+  const padTop = 8;
+  const padBottom = 22;
+  const openW = Math.max(30, w * 0.035);
+  const fw = (w - openW) / FRETS;
   const sh = (h - padTop - padBottom) / 6;
   const r = Math.max(7, Math.min(fw, sh) * 0.42);
   const x = (fret: number) => (fret <= capo ? (capo ? openW + (capo - 0.5) * fw : openW / 2) : openW + (fret - 0.5) * fw);
@@ -143,24 +143,41 @@ export function Fretboard({
   return (
     <div ref={wrap} className="fret" aria-label={t.songUi.fretboard}>
       <svg width={w} height={h} role="img">
-        {/* fret wires, nut, capo */}
+        <defs>
+          <linearGradient id="fret-wood" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#43322b" />
+            <stop offset="0.5" stopColor="#35261f" />
+            <stop offset="1" stopColor="#2b1e19" />
+          </linearGradient>
+        </defs>
+        {/* the fingerboard, its fret wires, the nut and the inlays */}
+        <rect className="fret__board" x={openW} y={padTop} width={w - openW} height={6 * sh} rx={2} fill="url(#fret-wood)" />
+        {INLAYS.map((f) => (
+          <circle key={`i${f}`} className="fret__inlay" cx={openW + (f - 0.5) * fw} cy={midY} r={r * 0.38} />
+        ))}
+        <circle className="fret__inlay" cx={openW + 11.5 * fw} cy={midY - sh} r={r * 0.38} />
+        <circle className="fret__inlay" cx={openW + 11.5 * fw} cy={midY + sh} r={r * 0.38} />
         {Array.from({ length: FRETS + 1 }, (_, f) => (
           <line
             key={`w${f}`}
             className={f === 0 ? 'fret__nut' : 'fret__wire'}
             x1={openW + f * fw}
             x2={openW + f * fw}
-            y1={y(5)}
-            y2={y(0)}
+            y1={padTop}
+            y2={padTop + 6 * sh}
           />
         ))}
-        {INLAYS.map((f) => (
-          <circle key={`i${f}`} className="fret__inlay" cx={openW + (f - 0.5) * fw} cy={midY} r={r * 0.35} />
-        ))}
-        <circle className="fret__inlay" cx={openW + 11.5 * fw} cy={midY - sh} r={r * 0.35} />
-        <circle className="fret__inlay" cx={openW + 11.5 * fw} cy={midY + sh} r={r * 0.35} />
+        {/* The three low strings are wound: thicker and warmer than the plain ones. */}
         {strings.map((_, s) => (
-          <line key={`s${s}`} className="fret__string" x1={openW} x2={w} y1={y(s)} y2={y(s)} style={{ strokeWidth: 1 + (5 - s) * 0.35 }} />
+          <line
+            key={`s${s}`}
+            className={s < 3 ? 'fret__string fret__string--wound' : 'fret__string'}
+            x1={0}
+            x2={w}
+            y1={y(s)}
+            y2={y(s)}
+            style={{ strokeWidth: 1 + (5 - s) * 0.38 }}
+          />
         ))}
         {capo > 0 && <rect className="fret__capo" x={openW + (capo - 0.5) * fw - 5} y={y(5) - sh * 0.4} width={10} height={y(0) - y(5) + sh * 0.8} rx={5} />}
         {NUMBERED.map((f) => (

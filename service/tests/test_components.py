@@ -171,3 +171,20 @@ def test_nothing_downloads_by_itself_and_the_size_is_shown_first(settings, tmp_p
         songs = client.get("/api/health").json()["components"]["songs"]
         assert songs["state"] == "missing"  # not installing: nothing started by itself
         assert songs["estimate"] == 2108273925
+
+
+def test_received_counts_the_busiest_interface_through_wraps():
+    readings = iter([
+        {1: 100, 2: 2**32 - 50},
+        {1: 300, 2: 150},  # 2 wrapped: +200
+        {1: 400, 2: 1150, 3: 7},  # 3 is new: counted from here
+        {1: 400, 2: 1150, 3: 5007},
+    ])
+    received = comp.Received(lambda: next(readings))
+    assert received.bytes() == 200
+    assert received.bytes() == 1200
+    assert received.bytes() == 5000
+
+
+def test_received_without_counters_is_zero():
+    assert comp.Received(lambda: None).bytes() == 0

@@ -7,7 +7,7 @@ const TabPanel = lazy(() => import('./TabPanel').then((m) => ({ default: m.TabPa
 
 export function LazyTabPanel(props: { song: Song; analysis: Analysis | null }) {
   return (
-    <Suspense fallback={<div className="tabview tabview--empty"><p>{L().songUi.tabOpening}</p></div>}>
+    <Suspense fallback={<div className="empty"><p className="empty__text">{L().songUi.tabOpening}</p></div>}>
       <TabPanel {...props} />
     </Suspense>
   );

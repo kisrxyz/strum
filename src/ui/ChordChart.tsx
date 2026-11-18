@@ -1,6 +1,7 @@
+import { Music2 } from 'lucide-react';
 import { messageText } from '../i18n/messages';
 import { useLang } from '../i18n/useLang';
-import { useLayoutEffect, useMemo, useRef, useState, type Ref } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Ref } from 'react';
 import { engine } from '../audio/engine';
 import { chromaFromSpectrum, judgeChord } from '../music/chroma';
 import { soundingChord } from '../music/display';
@@ -16,7 +17,7 @@ import { useCurrentChord } from './useCurrentChord';
 import { useEngineFrame } from './useEngineFrame';
 
 /** Rows shown after the current one (the box clips what does not fit). */
-const NEXT_ROWS = 5;
+const NEXT_ROWS = 8;
 
 type Kind = 'prev' | 'now' | 'next';
 
@@ -37,8 +38,10 @@ interface RowProps {
 
 function BarView({ bar, kind, name, marks, canEdit, editIndex, current }: Omit<RowProps, 'row' | 'section' | 'rowRef'> & { bar: ChartBar }) {
   const t = useLang();
+  // A crowded bar (three chords or more, or one on its last beat) writes its chords smaller, so they do not run into the next bar.
+  const crowded = bar.chords.length >= 4 ? 0.62 : bar.chords.length === 3 ? 0.76 : bar.chords.some((c) => c.beat > 0 && c.beat >= bar.beats - 1) ? 0.84 : 1;
   return (
-    <div className="chart__bar" data-start={bar.start} data-end={bar.end} data-beats={bar.beats}>
+    <div className="chart__bar" data-start={bar.start} data-end={bar.end} data-beats={bar.beats} style={crowded < 1 ? ({ '--fit': crowded } as CSSProperties) : undefined}>
       {kind !== 'prev' && <span className="chart__num num">{bar.number}</span>}
       <div className="chart__beats" style={{ gridTemplateColumns: `repeat(${bar.beats}, minmax(0, 1fr))` }}>
         {bar.chords.map(({ beat, index }, k) => {
@@ -74,9 +77,11 @@ function BarView({ bar, kind, name, marks, canEdit, editIndex, current }: Omit<R
 }
 
 function RowView({ row, kind, section, rowRef, ...rest }: RowProps) {
+  // The row carries its section's colour: the name's mark and the line on its left edge.
+  const hue = row?.kind ? ({ '--sec': `var(--sec-${row.kind})` } as CSSProperties) : undefined;
   return (
-    <div ref={rowRef} className={`chart__row chart__row--${kind}`}>
-      <div className="chart__section">{section ?? ''}</div>
+    <div ref={rowRef} className={`chart__row chart__row--${kind}`} style={hue}>
+      <div className="chart__section">{section && <span>{section}</span>}</div>
       <div className="chart__bars">
         {row?.bars.map((bar) => <BarView key={bar.start} bar={bar} kind={kind} {...rest} />)}
         {row && Array.from({ length: Math.max(0, 4 - row.bars.length) }, (_, i) => <div key={`e${i}`} className="chart__bar chart__bar--empty" />)}
@@ -157,15 +162,22 @@ export function ChordChart({ song, analysis }: { song: Song; analysis: Analysis 
 
   if (!rows.length) {
     const status = song.analysis?.status;
+    const busy = status === 'queued' || status === 'running';
     return (
-      <section className="chart chart--empty" aria-label={t.songUi.views.chords}>
-        <p>
+      <section className="empty" aria-label={t.songUi.views.chords}>
+        <Music2 size={36} />
+        <p className={`empty__text${status === 'error' ? ' note--cold' : ''}`}>
           {status === 'error'
             ? t.songUi.chart.failed(messageText(song.analysis?.error) || t.songUi.unknownError)
-            : status === 'queued' || status === 'running'
+            : busy
               ? t.songUi.chart.finding(song.analysis?.progress ? Math.round(song.analysis.progress * 100) : null)
               : t.songUi.chart.afterStems}
         </p>
+        {busy && (
+          <span className="bar empty__bar">
+            <span style={{ width: `${Math.round((song.analysis?.progress ?? 0) * 100)}%` }} />
+          </span>
+        )}
       </section>
     );
   }

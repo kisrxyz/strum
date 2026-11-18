@@ -1,13 +1,12 @@
 import type { Dict } from '../dict';
 
 export const library: Dict['library'] = {
-  title: 'Песни',
-  lists: { all: 'Все', favorite: 'Избранное', learn: 'Учу', set: 'Сет-лист', takes: 'Записи' },
+  lists: { all: 'Все песни', favorite: 'Избранное', learn: 'Учу', set: 'Сет-лист', takes: 'Записи' },
   listsLabel: 'Списки песен',
   nextList: 'Соседний список',
   songList: 'Список песен',
-  search: 'Поиск: название или исполнитель',
-  searchLabel: 'Поиск песни',
+  search: 'Поиск',
+  searchLabel: 'Поиск по названию или исполнителю',
   random: 'Случайная',
   randomTip: 'Случайная песня из этого списка',
   radio: 'Радио',
@@ -48,10 +47,11 @@ export const library: Dict['library'] = {
   separationFailed: 'Разделение не получилось',
   notSeparated: 'Не разделена на дорожки',
 
-  noSongs: 'Песен пока нет. Добавь первую или перетащи в окно mp3, m4a, wav или flac.',
+  noSongsTitle: 'Песен пока нет',
+  noSongs: 'Нажми Добавить песню или перетащи в окно mp3, m4a, wav, flac или таб Guitar Pro.',
   nothingFound: 'Ничего не нашлось. Нажми Esc, чтобы выйти из поиска.',
-  setEmpty: 'Сет-лист пуст. В списке Все выбери песню и нажми S.',
-  listEmpty: (list: string, key: string) => `В списке ${list} пока пусто. Нажми ${key} на песне, чтобы добавить её.`,
+  setEmpty: 'Сет-лист пуст. Выбери песню в списке Все песни и добавь её в сет-лист.',
+  listEmpty: (list: string, key: string) => `В списке ${list} пока пусто. Выбери песню в списке Все песни и нажми ${key}.`,
 
   card: 'Песня',
   songTitle: 'Название',
@@ -73,7 +73,7 @@ export const library: Dict['library'] = {
   noStems: 'Дорожек пока нет',
   barsAndChords: 'Такты и аккорды',
   hasLyrics: 'Текст есть',
-  noLyrics: 'Текста пока нет. Вставь его на экране Песня (Ctrl+V).',
+  noLyrics: 'Текста пока нет. Вставь его в плеере (Ctrl+V).',
   tabNamed: (name: string) => `Табы: ${name}`,
   noTab: 'Табов пока нет',
   tabPlays: (name: string) => `Звучит сам таб «${name}»: барабаны, бас и все партии из файла`,
@@ -115,7 +115,6 @@ export const library: Dict['library'] = {
   guitarOnly: 'гитара',
   guitarWithoutSong: 'гитара без песни',
   listen: 'Слушать',
-  position: 'Место',
   positionLabel: 'Место в записи',
   nudgeAsk: 'Если гитара спешит или опаздывает против песни:',
   nudgeLabel: 'Гитара против песни',
@@ -125,5 +124,5 @@ export const library: Dict['library'] = {
   download: 'Скачать mp3',
   downloadTip: 'mp3 в папку Загрузки',
   deleteTakeTip: 'Удалить запись: два нажатия',
-  noTakes: 'Записей пока нет. Клавиша \\ (над Enter) на любом экране начинает запись, ещё раз \\ останавливает и сохраняет.',
+  noTakes: 'Записей пока нет. Нажми Запись слева, чтобы начать, и ещё раз, чтобы остановить и сохранить.',
 };

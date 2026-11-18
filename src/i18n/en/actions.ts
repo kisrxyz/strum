@@ -61,7 +61,7 @@ export const actions = {
     tabSongStems: "In a tab song, the stems are the tab's parts.",
     noOtherStems: 'No other stems yet.',
     /** The stem model switch: the one place a model is named. */
-    model: (name: string) => `Stems: ${name}`,
+    model: (name: string) => `Stem model: ${name}`,
     separating: 'Separating into stems. You can play meanwhile.',
     separateFailed: 'Could not start separating.',
     dropFailed: 'Could not delete the stems.',
@@ -80,8 +80,8 @@ export const actions = {
     },
   },
   practice: {
-    clickOn: 'Click on',
-    clickOff: 'Click off',
+    clickOn: 'Metronome on',
+    clickOff: 'Metronome off',
     countInOn: 'Count-in on',
     countInOff: 'Count-in off',
     simpleOn: 'Simple chords: major and minor only',

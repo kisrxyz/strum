@@ -1,9 +1,10 @@
 # Strum's words
 
 All user-facing text lives here.
-- `en/` is the source shape; English is the default language.
-- `ru/` has exactly the same keys; `tsc` and `i18n.test.ts` check that.
-- One file per namespace. A namespace belongs to a group of screens.
+- `en/` is the source shape. `ru/` has exactly the same keys; `tsc` and `i18n.test.ts` check that. One file per namespace; a namespace belongs to a group of screens.
+- Six more languages are one file each: `es.ts`, `pt.ts` (Brazil), `de.ts`, `fr.ts`, `ja.ts`, `zh.ts` (Simplified). They are typed `PartialDict`: what one of them lacks is shown in English (`fill` in `index.ts`), and a key it names must exist in `en`. A new word needs `en` and `ru` only; add it to the six when there is time. They were written with less care than the first two: fix what reads wrong.
+- A first start takes the language of the system when Strum speaks it (`detectLanguage` in `lang.ts`), English otherwise.
+- The words of the left panel (`shell.screens`, Tuner, Record, Keys) sit under an icon in 68 px: about nine letters at most. Pick a shorter word before a longer exact one (German Setup, French Enreg.).
 
 ## How code uses it
 
@@ -16,7 +17,7 @@ All user-facing text lives here.
 
 ## Copy rules
 
-Both languages follow these rules.
+Every language follows these rules.
 
 1. **No «я» / "I".** The app never speaks as «я» / "I". States are impersonal: "Separating 40%", «Разделение 40 %», "Loading…", «Загрузка…».
 2. **Buttons.** A verb plus the thing it acts on, or a noun, 1–3 words: "Add song", «Добавить песню», "Loop", «Петля».
@@ -40,22 +41,22 @@ Use the same word for the same thing everywhere.
 
 | en | ru |
 |---|---|
-| Song / Songs (screens) | Песня / Песни |
+| Player / Songs (screens) | Плеер / Песни |
 | Amp (screen) | Комбик |
-| Input (screen) | Вход |
+| Settings (screen) | Настройки |
 | Tuner | Тюнер |
 | Record / Takes | Запись / Записи |
 | Lyrics · Chords · Tab · Notes (views) | Текст · Аккорды · Табы · Ноты |
 | Stems / Separate into stems | Дорожки / Разделить на дорожки |
 | Backing track (export) | Минусовка |
 | Loop · Section · Phrase · Bookmark | Петля · Часть · Фраза · Закладка |
-| Count-in · Click | Отсчёт · Клик |
-| Speed · Pitch | Скорость · Тон |
+| Count-in · Metronome | Отсчёт · Метроном |
+| Speed · Pitch | Скорость · Тональность |
 | Capo · Tuning · Simple chords | Каподастр · Строй · Простые аккорды |
 | Fretboard · Fingering · Scale | Гриф · Аппликатура · Лад |
 | Play by ear · Hint | Снять на слух · Подсказка |
 | Match song tone | Звук как в песне |
-| Original guitar (on/off) | Гитара в записи (играет / молчит) |
+| Original guitar (on/off) | Гитара из записи (вкл / выкл) |
 | Guitar only | Только гитара |
 | Repeat after me | Повтори за мной |
 | Speed trainer | Разгон |
@@ -67,10 +68,12 @@ Use the same word for the same thing everywhere.
 | Mix · Rate · Depth · Time · Feedback | Микс · Скорость · Глубина · Время · Повторы |
 | Spring · Plate | Пружина · Плита |
 | Sound card · Buffer · Channel · Latency | Звуковая карта · Буфер · Канал · Задержка |
-| Guitar path: ASIO · System audio | Звук гитары: ASIO · Системный звук |
+| Audio driver: ASIO · System audio | Звуковой драйвер: ASIO · Системный звук |
 | Set input level (G) | Настроить уровень (G) |
 | Keys (the sheet) | Клавиши |
-| Settings · Language | Настройки · Язык |
+| Mixer · Options (of the song) | Микшер · Параметры |
+| Fingers · Notes · Scale (what the neck shows) | Пальцы · Ноты · Гамма |
+| Language | Язык |
 
 ## Before and after
 

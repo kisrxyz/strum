@@ -10,11 +10,12 @@
 // 4. turns the window to the page once the service answers.
 //
 // Where things live: the program (uv.exe, app/ = the service's code, web/ = the built page) in the
-// install folder; Python, its packages, the download cache, the neural networks and the logs in
-// %LOCALAPPDATA%\app.strum (the uninstaller's «delete app data» removes it); the songs, takes,
-// settings and own amps in the user's own folder, C:\Users\<name>\Strum (never touched by the
-// uninstaller). Not Documents: on many computers Documents is synced to OneDrive, which would upload
-// gigabytes of stems and lock files while the app writes them.
+// install folder; Python, its packages, the download cache, the neural networks, the logs and
+// everything Python compiles while it runs (.pyc, Numba's cache) in %LOCALAPPDATA%\app.strum (the
+// uninstaller's «delete app data» removes it), so nothing is ever written into the install folder;
+// the songs, takes, settings and own amps in the user's own folder, C:\Users\<name>\Strum (never
+// touched by the uninstaller). Not Documents: on many computers Documents is synced to OneDrive,
+// which would upload gigabytes of stems and lock files while the app writes them.
 //
 // For checks: STRUM_DATA_DIR and STRUM_LOCAL_DIR replace those two folders, STRUM_GUITAR_FAKE plays
 // a fake input instead of the sound card (KV_GUITAR_FAKE of the engine).
@@ -123,7 +124,8 @@ fn show(window: &WebviewWindow, state: &str, detail: &str) {
 fn saved_language(docs: &Path) -> String {
     let text = fs::read_to_string(docs.join("settings.json")).unwrap_or_default();
     let value: serde_json::Value = serde_json::from_str(&text).unwrap_or_default();
-    value["state"]["language"].as_str().unwrap_or("en").to_string()
+    // Empty on a first start: the start screen then takes the system's language, when it has it.
+    value["state"]["language"].as_str().unwrap_or("").to_string()
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -225,7 +227,10 @@ fn base_env(command: &mut Command, p: &Paths) {
         .env("PYTHONUNBUFFERED", "1")
         // Compiled code beside the environment, not in the program's folder (the uninstaller
         // removes what it installed and would leave those behind).
-        .env("PYTHONPYCACHEPREFIX", p.local.join("pycache"));
+        .env("PYTHONPYCACHEPREFIX", p.local.join("pycache"))
+        // Numba keeps the guitar engine's compiled kernels in a cache of its own, which the line
+        // above does not move: without this it is __pycache__ beside kv_guitar's source.
+        .env("NUMBA_CACHE_DIR", p.local.join("numba"));
 }
 
 // ---------------------------------------------------------------------------------------------

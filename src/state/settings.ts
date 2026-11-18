@@ -5,7 +5,7 @@ import type { EngineBuffer } from '../audio/native/protocol';
 import type { ChannelMode } from '../dsp/channel';
 import { cleanTrim } from '../dsp/inputTrim';
 import type { MainsHz } from '../dsp/mains';
-import { isLang, type Lang } from '../i18n/lang';
+import { detectLanguage, isLang, type Lang } from '../i18n/lang';
 import type { SongView } from '../song/types';
 import { DEFAULT_PRESETS, forgetAssetIn, mergePreset, nextIndex, upgradeFirstAmps, upgradeFirstEffects, type Preset, type PresetPatch } from './presets';
 
@@ -55,7 +55,7 @@ export interface SettingsData {
   degrees: boolean;
   /** «Сет-лист»: song ids in the order they are played. */
   setlist: string[];
-  /** The interface's language (step 1 of Strum, 2026-11-17): English for a fresh install. */
+  /** The interface's language: on a fresh install the system's, when Strum speaks it; English otherwise. */
   language: Lang;
   /** The hum filter's mains: heard by ear (`auto`) or chosen by hand. */
   mains: MainsSetting;
@@ -87,6 +87,7 @@ interface SettingsActions {
   setLastSongId(id: string | null): void;
   setSongVolumeDb(db: number): void;
   stepNeckView(): void;
+  setNeckView(view: NeckView): void;
   toggleNeck(view: SongView): void;
   toggleDegrees(): void;
   setSetlist(ids: string[]): void;
@@ -138,7 +139,7 @@ const DEFAULTS: SettingsData = {
   neckShown: NECK_SHOWN,
   degrees: false,
   setlist: [],
-  language: 'en',
+  language: detectLanguage(typeof navigator === 'undefined' ? undefined : navigator.languages),
   mains: 'auto',
   mainsHz: 50,
   saveRawInput: false,
@@ -171,6 +172,7 @@ export const useSettings = create<SettingsState>()(
       markSetupDone: () => set({ setupDone: true }),
       setLastSongId: (id) => set({ lastSongId: id }),
       setSongVolumeDb: (db) => set({ songVolumeDb: clamp(db, SONG_VOLUME_MIN_DB, SONG_VOLUME_MAX_DB) }),
+      setNeckView: (neckView) => set({ neckView }),
       stepNeckView: () => set({ neckView: NECK_VIEWS[(NECK_VIEWS.indexOf(get().neckView) + 1) % NECK_VIEWS.length] }),
       toggleNeck: (view) => set({ neckShown: { ...get().neckShown, [view]: !get().neckShown[view] } }),
       toggleDegrees: () => set({ degrees: !get().degrees }),

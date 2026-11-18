@@ -1,5 +1,6 @@
 // The installed app's first start on «Songs»: how much of song separation is downloaded, and the
 // words model when asked for (service components.py). The author's copy never shows it.
+import { HardDriveDownload } from 'lucide-react';
 import type { Dict } from '../i18n';
 import { messageText } from '../i18n/messages';
 import { useLang } from '../i18n/useLang';
@@ -70,22 +71,23 @@ export function SetupNote() {
   if (!line) return null;
   const start = () => void api.installComponent(line.part).then(refreshLibrary, refreshLibrary);
   return (
-    <div className="lib__setup" role="status">
-      <div className="lib__setup-line">
-        <span className={line.error ? 'lib__setup-text lib__setup-text--error' : 'lib__setup-text'}>{line.text}</span>
-        {line.action && (
-          <button type="button" className="btn btn--quiet" onClick={start}>
-            {line.action === 'retry' ? t.library.setup.retry : t.library.setup.download}
-          </button>
+    <div className="setup" role="status">
+      <HardDriveDownload size={20} />
+      <div className="setup__words">
+        <span className={line.error ? 'setup__text note--cold' : 'setup__text'}>{line.text}</span>
+        {line.error && <p className="note">{line.error}</p>}
+        {line.part === 'songs' && !line.error && <p className="note">{line.hint ?? t.library.setup.wait}</p>}
+        {line.fraction !== null && (
+          <span className="bar setup__bar" aria-hidden="true">
+            <span style={{ width: `${Math.round(line.fraction * 100)}%` }} />
+          </span>
         )}
       </div>
-      {line.fraction !== null && (
-        <div className="lib__setup-bar" aria-hidden="true">
-          <span style={{ width: `${Math.round(line.fraction * 100)}%` }} />
-        </div>
+      {line.action && (
+        <button type="button" className="btn btn--lg is-on" onClick={start}>
+          {line.action === 'retry' ? t.library.setup.retry : t.library.setup.download}
+        </button>
       )}
-      {line.error && <p className="lib__setup-hint">{line.error}</p>}
-      {line.part === 'songs' && !line.error && <p className="lib__setup-hint">{line.hint ?? t.library.setup.wait}</p>}
     </div>
   );
 }

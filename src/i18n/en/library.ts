@@ -1,13 +1,12 @@
 // Namespace `library`: the Songs screen (songs, lists, takes) and adding a song.
 // See ../README.md for the copy rules and the glossary.
 export const library = {
-  title: 'Songs',
-  lists: { all: 'All', favorite: 'Favorites', learn: 'Learning', set: 'Set list', takes: 'Takes' },
+  lists: { all: 'All songs', favorite: 'Favorites', learn: 'Learning', set: 'Set list', takes: 'Takes' },
   listsLabel: 'Song lists',
   nextList: 'Next list',
   songList: 'Song list',
-  search: 'Search: title or artist',
-  searchLabel: 'Search songs',
+  search: 'Search',
+  searchLabel: 'Search by title or artist',
   random: 'Random',
   randomTip: 'A random song from this list',
   radio: 'Radio',
@@ -52,10 +51,11 @@ export const library = {
   notSeparated: 'Not separated into stems',
 
   // Empty lists
-  noSongs: 'No songs yet. Add one, or drop an mp3, m4a, wav or flac into the window.',
+  noSongsTitle: 'No songs yet',
+  noSongs: 'Press Add song, or drop an mp3, m4a, wav, flac or a Guitar Pro tab into the window.',
   nothingFound: 'Nothing found. Press Esc to leave the search.',
-  setEmpty: 'The set list is empty. In All, pick a song and press S.',
-  listEmpty: (list: string, key: string) => `${list} is empty. Press ${key} on a song to add it.`,
+  setEmpty: 'The set list is empty. Pick a song in All songs and add it to the set list.',
+  listEmpty: (list: string, key: string) => `${list} is empty. Pick a song in All songs and press ${key} to add it.`,
 
   // The song's card
   card: 'Song',
@@ -78,7 +78,7 @@ export const library = {
   noStems: 'No stems yet',
   barsAndChords: 'Bars and chords',
   hasLyrics: 'Has lyrics',
-  noLyrics: 'No lyrics yet. Paste them on the Song screen (Ctrl+V).',
+  noLyrics: 'No lyrics yet. Paste them in the player (Ctrl+V).',
   tabNamed: (name: string) => `Tab: ${name}`,
   noTab: 'No tab yet',
   tabPlays: (name: string) => `The tab “${name}” plays itself: drums, bass and every part from the file`,
@@ -123,7 +123,6 @@ export const library = {
   guitarOnly: 'guitar',
   guitarWithoutSong: 'guitar without the song',
   listen: 'Listen',
-  position: 'Position',
   positionLabel: 'Position in the take',
   nudgeAsk: 'If the guitar is early or late against the song:',
   nudgeLabel: 'Guitar against the song',
@@ -133,5 +132,5 @@ export const library = {
   download: 'Download mp3',
   downloadTip: 'Saves the mp3 to Downloads',
   deleteTakeTip: 'Delete the take: press twice',
-  noTakes: 'No takes yet. Press \\ (above Enter) on any screen to start recording, and \\ again to stop and save.',
+  noTakes: 'No takes yet. Press Record on the left to start, and again to stop and save.',
 };

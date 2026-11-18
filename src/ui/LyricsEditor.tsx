@@ -45,9 +45,9 @@ export function LyricsEditor({ song }: { song: Song }) {
   };
 
   return (
-    <section className="lyrics-editor" aria-label={e.label}>
+    <section className="editor lyrics-editor" aria-label={e.label}>
       <textarea
-        className="lyrics-editor__text"
+        className="input-text lyrics-editor__text"
         value={draft}
         spellCheck={false}
         placeholder={e.placeholder}
@@ -55,30 +55,30 @@ export function LyricsEditor({ song }: { song: Song }) {
       />
       <div className="lyrics-editor__side">
         <div className="lyrics-editor__buttons">
-          <button type="button" className="primary" onClick={save}>
+          <button type="button" className="btn btn--primary" onClick={save}>
             {t.common.done}
           </button>
-          <button type="button" className="chip" onClick={close}>
+          <button type="button" className="btn" onClick={close}>
             {t.common.cancel}
           </button>
-          <button type="button" className="chip" onClick={() => void textActions.useDraft().then(close)}>
+          <button type="button" className="btn" onClick={() => void textActions.useDraft().then(close)}>
             {e.draft}
           </button>
-          <button type="button" className="chip" onClick={() => void textActions.findOnline().then(close)}>
+          <button type="button" className="btn" onClick={() => void textActions.findOnline().then(close)}>
             {e.findOnline}
           </button>
           {song.lyrics && (
             <>
-              <button type="button" className="chip" onClick={() => textActions.saveLrc()}>
+              <button type="button" className="btn" onClick={() => textActions.saveLrc()}>
                 {e.saveLrc}
               </button>
-              <button type="button" className="chip" onClick={() => textActions.saveChordPro()}>
+              <button type="button" className="btn" onClick={() => textActions.saveChordPro()}>
                 {e.saveCho}
               </button>
-              <button type="button" className="chip" onClick={() => window.print()}>
+              <button type="button" className="btn" onClick={() => window.print()}>
                 {t.songUi.print}
               </button>
-              <button type="button" className="chip" onClick={() => textActions.removeLyrics()}>
+              <button type="button" className="btn" onClick={() => textActions.removeLyrics()}>
                 {e.remove}
               </button>
             </>
