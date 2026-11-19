@@ -1,0 +1,48 @@
+# Builds the Windows installer from this repository's source, the way `npm run build:app` does on
+# a laptop. Runs by hand (Actions → Build → Run workflow) and on every pushed version tag (v*).
+# The installer comes out as the run's artifact «Strum-installer». No caches: the build starts from
+# the source every time, so what is signed is exactly what the source makes.
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      # uv goes into the installer: the app uses it to set up its Python on the first start.
+      - uses: astral-sh/setup-uv@v10
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      # Without scripts: postinstall would also set up the song service and its neural networks
+      # (several GB), which the installer does not carry.
+      - name: Packages
+        run: npm ci --ignore-scripts
+
+      # The built-in amp sounds, cabinets, the NAM engine and the tab sounds, downloaded from pinned
+      # commits; the amp captures and the soundfont are checked by SHA-256 (scripts/setup-tones.mjs).
+      - name: Sounds
+        run: node scripts/setup-tones.mjs
+
+      - name: Installer
+        run: npm run build:app
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Strum-installer
+          path: shell/target/release/bundle/nsis/*.exe
+          if-no-files-found: error
