@@ -1,0 +1,48 @@
+name: Something doesn't work / Что-то не работает
+description: A bug in Strum. English or Russian. / Ошибка в Strum. По-английски или по-русски.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before writing, look at [Troubleshooting](../blob/main/docs/troubleshooting.md) / [Если не работает](../blob/main/docs/troubleshooting.ru.md).
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened / Что случилось
+      description: What you did, what you expected, what happened instead. / Что делал, чего ждал, что получилось.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Strum version / Версия Strum
+      description: Settings → About and licenses / Настройки → О программе и лицензии
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows
+      placeholder: "Windows 11 24H2"
+  - type: input
+    id: card
+    attributes:
+      label: Audio interface and driver / Звуковая карта и драйвер
+      placeholder: "Focusrite Scarlett Solo, ASIO"
+  - type: dropdown
+    id: gpu
+    attributes:
+      label: NVIDIA graphics card / Видеокарта NVIDIA
+      options:
+        - "Yes / Есть"
+        - "No / Нет"
+        - "Don't know / Не знаю"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Журналы
+      description: |
+        If Strum failed: the files from %LOCALAPPDATA%\app.strum\logs. They may show file names and your Windows user name: look through them first.
+        Если Strum сломался: файлы из %LOCALAPPDATA%\app.strum\logs. Там могут быть имена файлов и имя пользователя Windows: сначала просмотри их.

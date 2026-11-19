@@ -40,6 +40,13 @@ The installer needs no administrator rights: Strum goes into your user folder.
 
 Separating a song takes under a minute with an NVIDIA card and a few minutes without.
 
+## Help
+
+- [Getting started](docs/getting-started.md): plug in the guitar, set the level, add a song, play.
+- [Troubleshooting](docs/troubleshooting.md): no sound, delay, crackles, installing.
+- [Report a bug](../../issues/new/choose), in English or Russian.
+- [Privacy](docs/privacy.md): Strum collects nothing and goes online only in the cases listed there.
+
 ## What you need
 
 - An audio interface with an ASIO driver (most have one) for low latency. Without ASIO Strum plays the guitar through Windows audio, with more delay.
