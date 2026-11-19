@@ -70,6 +70,15 @@ npm run test:service # тесты сервиса
 npm run build:app    # Strum.exe и установщик в shell/target/release/bundle/nsis
 ```
 
+## Code signing policy
+
+Бесплатную подпись кода даёт [SignPath.io](https://about.signpath.io/), сертификат — [SignPath Foundation](https://signpath.org/) (Free code signing provided by SignPath.io, certificate by SignPath Foundation).
+
+- Пишет и проверяет код (committers and reviewers): [автор проекта](../../../)
+- Одобряет подпись (approvers): [автор проекта](../../../)
+
+Каждый установщик собирается из кода этого репозитория на [GitHub Actions](.github/workflows/build.yml), и каждую подпись одобряют вручную. Что Strum отправляет в интернет и когда: [Приватность](docs/privacy.ru.md).
+
 ## Лицензия
 
 Strum — свободная программа под [GNU GPL v3](LICENSE). Снимки комбиков в ней тоже под GPL v3. Всё, на чём она построена, — в [LICENSES.txt](LICENSES.txt).

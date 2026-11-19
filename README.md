@@ -70,6 +70,15 @@ npm run test:service # service tests
 npm run build:app    # Strum.exe and the installer in shell/target/release/bundle/nsis
 ```
 
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+
+- Committers and reviewers: [the project's author](../../../)
+- Approvers: [the project's author](../../../)
+
+Every installer is built from this repository's source by [GitHub Actions](.github/workflows/build.yml), and every signing request is approved by hand. What Strum sends over the internet, and when: [Privacy](docs/privacy.md).
+
 ## License
 
 Strum is free software under the [GNU GPL v3](LICENSE). The amp captures it ships are GPL v3 as well. Everything it is built on is listed in [LICENSES.txt](LICENSES.txt).
