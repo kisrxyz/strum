@@ -24,7 +24,7 @@ jobs:
           node-version: 24
 
       # uv goes into the installer: the app uses it to set up its Python on the first start.
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3
 
       - uses: dtolnay/rust-toolchain@stable
 
